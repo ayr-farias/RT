@@ -1,0 +1,106 @@
+---
+import { site, type Lang } from '@/data/site';
+import { routes, type RouteKey } from '@/i18n/routes';
+import { interpreters } from '@/data/interpreters';
+
+interface FaqItem { question: string; answer: string; }
+interface Crumb { name: string; key: RouteKey; }
+
+interface Props {
+  lang: Lang;
+  routeKey: RouteKey;
+  /** Emitted on the explainer, generated from the faq collection so the markup
+   *  and the visible page cannot drift (§9). */
+  faq?: FaqItem[];
+  breadcrumbs?: Crumb[];
+}
+const { lang, routeKey, faq, breadcrumbs } = Astro.props;
+
+const url = (k: RouteKey) => new URL(routes[k][lang], site.origin).href;
+const orgId = `${site.origin}/#organization`;
+
+const address = {
+  '@type': 'PostalAddress',
+  ...(site.address.street ? { streetAddress: site.address.street } : {}),
+  addressLocality: site.address.locality,
+  addressRegion: site.address.region,
+  ...(site.address.postalCode ? { postalCode: site.address.postalCode } : {}),
+  addressCountry: site.address.country,
+};
+
+const people = interpreters.map((p) => ({
+  '@type': 'Person',
+  '@id': `${site.origin}/#${p.id}`,
+  name: p.name,
+  jobTitle: lang === 'pt' ? 'Intérprete de conferência' : 'Conference interpreter',
+  knowsLanguage: p.knowsLanguage,
+  memberOf: {
+    '@type': 'Organization',
+    name: p.association.name,
+    url: p.association.url,
+  },
+  worksFor: { '@id': orgId },
+}));
+
+const sameAs = [site.social.linkedin, site.social.googleBusiness].filter(Boolean);
+
+const organization = {
+  '@type': 'ProfessionalService',
+  '@id': orgId,
+  name: site.brand,
+  legalName: site.legal.razaoSocial,
+  taxID: site.legal.cnpj,
+  url: site.origin,
+  telephone: `+${site.contact.whatsappE164}`,
+  email: site.contact.email,
+  address,
+  areaServed: site.areaServed.map((city) => ({
+    '@type': 'City',
+    name: city,
+  })),
+  ...(sameAs.length ? { sameAs } : {}),
+  employee: people.map((p) => ({ '@id': p['@id'] })),
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: lang === 'pt' ? 'Serviços de interpretação' : 'Interpretation services',
+    itemListElement: (['portable', 'remote', 'consecutive', 'conferences'] as const).map(
+      (k, i) => ({
+        '@type': 'Offer',
+        position: i + 1,
+        itemOffered: { '@type': 'Service', name: k, url: url(k) },
+      }),
+    ),
+  },
+  // No aggregateRating: it is a manual-action risk without real reviews (§9).
+};
+
+const graph: Record<string, unknown>[] = [organization, ...people];
+
+if (faq?.length) {
+  graph.push({
+    '@type': 'FAQPage',
+    '@id': `${url(routeKey)}#faq`,
+    mainEntity: faq.map((f) => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.answer },
+    })),
+  });
+}
+
+if (breadcrumbs?.length) {
+  graph.push({
+    '@type': 'BreadcrumbList',
+    '@id': `${url(routeKey)}#breadcrumbs`,
+    itemListElement: breadcrumbs.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.name,
+      item: url(c.key),
+    })),
+  });
+}
+
+const jsonLd = { '@context': 'https://schema.org', '@graph': graph };
+---
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />

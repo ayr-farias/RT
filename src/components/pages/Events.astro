@@ -1,0 +1,35 @@
+---
+import { getCollection } from 'astro:content';
+import type { Lang } from '@/data/site';
+import { t } from '@/i18n/utils';
+import Base from '@/layouts/Base.astro';
+import EventGrid from '@/components/EventGrid.astro';
+import Schema from '@/components/Schema.astro';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const s = t(lang);
+
+const events = await getCollection('events');
+
+const seo = lang === 'pt'
+  ? { title: 'Eventos atendidos — Recife Translators',
+      description: 'Amostra de eventos de interpretação simultânea, consecutiva e remota em Pernambuco e no Nordeste.' }
+  : { title: 'Events we have worked — Recife Translators',
+      description: 'A sample of simultaneous, consecutive and remote interpreting assignments in Pernambuco and the Northeast.' };
+---
+<Base lang={lang} routeKey="events" title={seo.title} description={seo.description}>
+  <Schema slot="head" lang={lang} routeKey="events" />
+  <div class="shell section">
+    <h1>{s.events.title}</h1>
+    <p class="lede measure">{s.events.intro}</p>
+    <div class="grid-wrap">
+      <EventGrid lang={lang} events={events} />
+    </div>
+  </div>
+</Base>
+
+<style>
+  .lede { font-size: var(--step-1); margin-block-start: var(--space-m); }
+  .grid-wrap { margin-block-start: var(--space-xl); }
+</style>

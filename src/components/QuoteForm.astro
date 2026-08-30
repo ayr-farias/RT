@@ -1,0 +1,299 @@
+---
+import type { Lang } from '@/data/site';
+import { path } from '@/i18n/routes';
+import { t } from '@/i18n/utils';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const s = t(lang);
+const f = s.quote.fields;
+
+// Handed to the island as one attribute so the client script ships no strings.
+const messages = JSON.stringify({
+  required: s.quote.validation.required,
+  pairsRequired: s.quote.validation.pairsRequired,
+  email: s.quote.validation.email,
+  consent: s.quote.validation.consent,
+  submitting: f.submitting,
+  error: s.quote.error.body,
+});
+---
+<form
+  class="quote"
+  method="POST"
+  action="/api/quote"
+  data-quote-form
+  data-messages={messages}
+  novalidate
+>
+  <input type="hidden" name="lang" value={lang} />
+  {/* Spam trap 1: honeypot. Real people never fill this. */}
+  <div class="hp" aria-hidden="true">
+    <label>
+      Website
+      <input type="text" name="website" tabindex="-1" autocomplete="off" />
+    </label>
+  </div>
+  {/* Spam trap 2: submission-time. Stamped on load, checked server-side (§8). */}
+  <input type="hidden" name="loadedAt" data-loaded-at value="" />
+
+  <fieldset>
+    <legend>{lang === 'pt' ? 'O evento' : 'The event'}</legend>
+
+    <p class="field">
+      <label for="q-dates">{f.dates} <span class="req">({f.required})</span></label>
+      <input id="q-dates" name="dates" type="text" required
+             placeholder={lang === 'pt' ? 'ex.: 14 e 15 de maio' : 'e.g. 14–15 May'} />
+      <span class="help">{f.datesHelp}</span>
+    </p>
+
+    <div class="row">
+      <p class="field">
+        <label for="q-city">{f.city} <span class="req">({f.required})</span></label>
+        <input id="q-city" name="city" type="text" required autocomplete="address-level2" />
+      </p>
+      <p class="field">
+        <label for="q-venue">{f.venue} <span class="opt">({f.optional})</span></label>
+        <input id="q-venue" name="venue" type="text" />
+      </p>
+    </div>
+
+    <fieldset class="sub">
+      <legend>{f.roomFormat} <span class="req">({f.required})</span></legend>
+      {Object.entries(f.roomOptions).map(([key, label]) => (
+        <label class="choice">
+          <input type="radio" name="roomFormat" value={key} required />
+          {label}
+        </label>
+      ))}
+    </fieldset>
+
+    <div class="row">
+      <p class="field">
+        <label for="q-duration">{f.duration} <span class="req">({f.required})</span></label>
+        <select id="q-duration" name="duration" required>
+          <option value="">—</option>
+          {Object.entries(f.durationOptions).map(([key, label]) => (
+            <option value={key}>{label}</option>
+          ))}
+        </select>
+      </p>
+      <p class="field">
+        <label for="q-listeners">{f.listeners} <span class="req">({f.required})</span></label>
+        <input id="q-listeners" name="listeners" type="number" min="1" inputmode="numeric" required />
+      </p>
+    </div>
+
+    <fieldset class="sub">
+      <legend>{f.pairs} <span class="req">({f.required})</span></legend>
+      <label class="choice"><input type="checkbox" name="pairs" value="en-pt" /> Inglês ↔ Português</label>
+      <label class="choice"><input type="checkbox" name="pairs" value="pt-es" /> Português ↔ Espanhol</label>
+      <label class="choice">
+        <input type="checkbox" name="pairs" value="other" />
+        {lang === 'pt' ? 'Outro par' : 'Another pair'}
+      </label>
+    </fieldset>
+
+    <fieldset class="sub">
+      <legend>{f.hasEquipment} <span class="req">({f.required})</span></legend>
+      <label class="choice"><input type="radio" name="hasEquipment" value="yes" required /> {f.yes}</label>
+      <label class="choice"><input type="radio" name="hasEquipment" value="no" /> {f.no}</label>
+      <label class="choice"><input type="radio" name="hasEquipment" value="unsure" /> {f.unsure}</label>
+    </fieldset>
+  </fieldset>
+
+  <fieldset>
+    <legend>{lang === 'pt' ? 'Quem está pedindo' : 'Who is asking'}</legend>
+
+    <p class="field">
+      <label for="q-client-type">{f.clientType} <span class="req">({f.required})</span></label>
+      <select id="q-client-type" name="clientType" required>
+        <option value="">—</option>
+        {Object.entries(f.clientTypes).map(([key, label]) => (
+          <option value={key}>{label}</option>
+        ))}
+      </select>
+    </p>
+
+    <div class="row">
+      <p class="field">
+        <label for="q-name">{f.name} <span class="req">({f.required})</span></label>
+        <input id="q-name" name="name" type="text" required autocomplete="name" />
+      </p>
+      <p class="field">
+        <label for="q-email">{f.email} <span class="req">({f.required})</span></label>
+        <input id="q-email" name="email" type="email" required autocomplete="email" />
+      </p>
+    </div>
+
+    <p class="field">
+      <label for="q-whatsapp">{f.whatsapp} <span class="opt">({f.optional})</span></label>
+      <input id="q-whatsapp" name="whatsapp" type="tel" autocomplete="tel" />
+    </p>
+
+    <p class="field">
+      <label for="q-notes">{f.notes} <span class="opt">({f.optional})</span></label>
+      <textarea id="q-notes" name="notes" rows="4"></textarea>
+    </p>
+
+    {/* LGPD: specific purpose, unticked by default (§13). */}
+    <p class="field consent">
+      <label class="choice">
+        <input type="checkbox" name="consent" value="yes" required />
+        <span>
+          {f.consent} <a href={path('privacy', lang)}>{s.privacy.title}</a>.
+        </span>
+      </label>
+    </p>
+  </fieldset>
+
+  <p class="actions">
+    <button class="btn btn--primary" type="submit" data-submit>{f.submit}</button>
+  </p>
+
+  <p class="form-error" role="alert" hidden data-error></p>
+</form>
+
+<div class="confirm" role="status" hidden data-success>
+  <h2>{s.quote.success.title}</h2>
+  <p class="measure">{s.quote.success.body}</p>
+</div>
+
+<style>
+  .quote { display: grid; gap: var(--space-l); max-width: 44rem; }
+  fieldset { border: 0; padding: 0; display: grid; gap: var(--space-m); }
+  legend {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 600;
+    padding: 0;
+    margin-block-end: var(--space-s);
+  }
+  fieldset.sub {
+    border: 1px solid var(--hairline);
+    border-radius: 2px;
+    padding: var(--space-m);
+    gap: 0.5rem;
+  }
+  fieldset.sub legend {
+    font-size: var(--step-0);
+    padding-inline: 0.4rem;
+    margin: 0;
+  }
+  .field { display: grid; gap: 0.35rem; margin: 0; }
+  .row { display: grid; gap: var(--space-m); grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); }
+  label {
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 600;
+  }
+  .req, .opt { font-weight: 400; color: var(--mute-on-light); }
+  .help { font-size: var(--step--1); color: var(--mute-on-light); }
+  input[type='text'], input[type='email'], input[type='tel'], input[type='number'], select, textarea {
+    border: 1px solid var(--mute-on-light);
+    border-radius: 2px;
+    padding: 0.6em 0.7em;
+    background: #fff;
+    font-family: var(--font-body);
+    width: 100%;
+  }
+  textarea { resize: vertical; }
+  .choice {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    font-weight: 400;
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+  }
+  .choice input { margin: 0; flex: none; translate: 0 0.15em; }
+  .consent .choice { align-items: flex-start; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .actions { margin: 0; }
+  [aria-invalid='true'] { border-color: #A3301B; border-width: 2px; }
+  .field-error { color: #A3301B; font-size: var(--step--1); font-family: var(--font-display); }
+  .form-error {
+    border-inline-start: 3px solid #A3301B;
+    padding-inline-start: var(--space-s);
+    color: #A3301B;
+  }
+  .confirm {
+    border-inline-start: 3px solid var(--channel);
+    padding: var(--space-m);
+    background: color-mix(in srgb, var(--channel) 8%, transparent);
+  }
+  .confirm h2 { font-size: var(--step-2); margin-block-end: var(--space-s); }
+</style>
+
+<script>
+  // Island 2 of 3: quote form (§12). Validates, posts JSON, swaps in the
+  // confirmation state. Without JS the form still POSTs natively to /api/quote,
+  // which returns an HTML confirmation page.
+  const form = document.querySelector<HTMLFormElement>('[data-quote-form]');
+  if (form) {
+    const stamp = form.querySelector<HTMLInputElement>('[data-loaded-at]');
+    if (stamp) stamp.value = String(Date.now());
+
+    const errorBox = form.querySelector<HTMLElement>('[data-error]');
+    const success = document.querySelector<HTMLElement>('[data-success]');
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]');
+    const messages = JSON.parse(form.dataset.messages ?? '{}');
+
+    const clearErrors = () => {
+      form.querySelectorAll('.field-error').forEach((n) => n.remove());
+      form.querySelectorAll('[aria-invalid]').forEach((n) => n.removeAttribute('aria-invalid'));
+      errorBox?.setAttribute('hidden', '');
+    };
+
+    const fail = (el: Element | null, msg: string) => {
+      if (!el) return;
+      el.setAttribute('aria-invalid', 'true');
+      const note = document.createElement('span');
+      note.className = 'field-error';
+      note.textContent = msg;
+      el.closest('.field, fieldset')?.appendChild(note);
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      clearErrors();
+
+      // Native constraint validation carries the required-field checks; the
+      // pair checkboxes need a manual one because `required` on a checkbox
+      // group only enforces the individual box.
+      let ok = form.checkValidity();
+      const pairs = form.querySelectorAll<HTMLInputElement>('input[name="pairs"]:checked');
+      if (pairs.length === 0) {
+        ok = false;
+        fail(form.querySelector('input[name="pairs"]')?.closest('fieldset') ?? null, messages.pairsRequired ?? '');
+      }
+      if (!ok) {
+        form.reportValidity();
+        return;
+      }
+
+      submit?.setAttribute('disabled', '');
+      const original = submit?.textContent ?? '';
+      if (submit) submit.textContent = messages.submitting ?? original;
+
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: new FormData(form),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        form.setAttribute('hidden', '');
+        success?.removeAttribute('hidden');
+        success?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch {
+        if (errorBox) {
+          errorBox.textContent = messages.error ?? 'Error';
+          errorBox.removeAttribute('hidden');
+        }
+        submit?.removeAttribute('disabled');
+        if (submit) submit.textContent = original;
+      }
+    });
+  }
+</script>

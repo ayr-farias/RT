@@ -1,0 +1,189 @@
+@import './fonts.css';
+
+/* ─────────────────────────────────────────────────────────────
+   Tokens. The blues are taken from the existing recifetranslators.com.br:
+     #345895  the site's dominant indigo
+     #282C33  its dark slate panels — reused here as body ink
+     #ABB2BF  its muted blue-grey — the basis for the mute tones
+
+   The accent is not the live site's magenta; it is an aqua drawn from the
+   same blue family, so it reads as a live-channel signal without leaving the
+   palette. It carries the role the gold had in the original design direction.
+
+   WCAG AA (§12) is enforced per background, because #345895 is a mid-tone and
+   a single accent value cannot clear 4.5:1 on both the page and the indigo:
+     --channel        full strength — fills, rules, large text only
+     --channel-on-dark   small text on indigo grounds   4.52
+     --channel-on-light  small text on the page         4.54
+     --mute-on-light     secondary text on the page     4.51
+     --mute-on-dark      secondary text on indigo       4.50
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --brand:      #345895;  /* primary indigo, section grounds */
+  --brand-deep: #213860;  /* footer, hero overlay */
+  --page:       #F1F3F7;  /* cool near-white, reading surface */
+  --ink:        #282C33;  /* body text */
+  --channel:    #2BB8C4;  /* the live-channel signal: fills, rules, active states */
+  --mute:       #8894A8;  /* hairlines, decorative blue-grey */
+
+  --channel-on-dark:  #93DBE1;
+  --channel-on-light: #1C7A83;
+  --mute-on-light:    #657082;
+  --mute-on-dark:     #C9CFD8;
+
+  --hairline: color-mix(in srgb, var(--mute) 45%, transparent);
+
+  --font-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Newsreader', Georgia, 'Times New Roman', serif;
+
+  /* Fluid scale, 320 → 1280 viewport */
+  --step--1: clamp(0.83rem, 0.80rem + 0.16vw, 0.92rem);
+  --step-0:  clamp(1.00rem, 0.95rem + 0.25vw, 1.15rem);
+  --step-1:  clamp(1.20rem, 1.10rem + 0.50vw, 1.50rem);
+  --step-2:  clamp(1.45rem, 1.25rem + 0.95vw, 2.05rem);
+  --step-3:  clamp(1.75rem, 1.40rem + 1.70vw, 2.90rem);
+  --step-4:  clamp(2.10rem, 1.50rem + 3.00vw, 4.20rem);
+
+  --measure: 66ch;      /* body copy under 70 characters (§11) */
+  --gutter: clamp(1.25rem, 5vw, 3rem);
+  --shell: 74rem;
+
+  --space-s: 0.75rem;
+  --space-m: 1.5rem;
+  --space-l: clamp(2.5rem, 6vw, 4.5rem);
+  --space-xl: clamp(4rem, 10vw, 8rem);
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.65;
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+img, picture, video, canvas, svg { display: block; max-width: 100%; }
+input, button, textarea, select { font: inherit; color: inherit; }
+p, h1, h2, h3, h4, li { overflow-wrap: break-word; }
+
+/* ── Typography. Sentence case throughout; no tracked-out caps (§11). ── */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+h1 { font-size: var(--step-4); font-stretch: 112%; } /* semi-expanded */
+h2 { font-size: var(--step-3); }
+h3 { font-size: var(--step-2); }
+h4 { font-size: var(--step-1); }
+p, li { text-wrap: pretty; }
+
+a { color: inherit; text-underline-offset: 0.18em; text-decoration-thickness: from-font; }
+a:hover { text-decoration-thickness: 2px; }
+
+:focus-visible {
+  outline: 3px solid var(--channel);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ── Layout ── */
+.shell {
+  width: min(100% - (var(--gutter) * 2), var(--shell));
+  margin-inline: auto;
+}
+.measure { max-width: var(--measure); }
+.section { padding-block: var(--space-xl); }
+.section--tight { padding-block: var(--space-l); }
+.stack > * + * { margin-block-start: var(--space-m); }
+.stack-s > * + * { margin-block-start: var(--space-s); }
+
+.on-dark {
+  background: var(--brand);
+  color: var(--page);
+}
+.on-dark h1, .on-dark h2, .on-dark h3 { color: var(--page); }
+.on-dark .secondary { color: var(--mute-on-dark); }
+.secondary { color: var(--mute-on-light); }
+
+/* Full-bleed media at section breaks rather than uniform rounded cards (§11) */
+.bleed {
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+}
+
+/* ── Eyebrow: sentence case, no letter-spacing theatrics ── */
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--mute-on-light);
+  margin-block-end: var(--space-s);
+}
+.on-dark .eyebrow { color: var(--mute-on-dark); }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  font-weight: 600;
+  padding: 0.75em 1.4em;
+  border: 2px solid transparent;
+  border-radius: 2px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+.btn--primary {
+  background: var(--channel);
+  color: var(--ink);       /* 5.63 on gold */
+  border-color: var(--channel);
+}
+.btn--primary:hover { background: color-mix(in srgb, var(--channel) 85%, var(--ink)); }
+.btn--secondary {
+  background: transparent;
+  color: var(--brand);
+  border-color: var(--brand);
+}
+.btn--secondary:hover { background: var(--brand); color: var(--page); }
+.on-dark .btn--secondary { color: var(--page); border-color: var(--page); }
+.on-dark .btn--secondary:hover { background: var(--page); color: var(--brand); }
+
+/* ── Skip link (§12 a11y) ── */
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--channel);
+  color: var(--ink);
+  padding: 0.75rem 1.25rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.skip:focus { left: 0; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+
+/* ── Motion: one orchestrated moment on the hero, nothing else (§11) ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,93 @@
+---
+import type { Lang } from '@/data/site';
+import { site } from '@/data/site';
+import { path } from '@/i18n/routes';
+import { t, formatList } from '@/i18n/utils';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const s = t(lang);
+const year = new Date().getFullYear();
+---
+<footer class="site-footer on-dark">
+  <div class="shell grid">
+    <div>
+      <p class="brand">{site.brand}</p>
+      <p class="secondary tagline">{s.footer.tagline}</p>
+    </div>
+
+    <nav aria-label={s.footer.servicesTitle}>
+      <h2 class="col-title">{s.footer.servicesTitle}</h2>
+      <ul>
+        <li><a href={path('portable', lang)}>{lang === 'pt' ? 'Simultânea portátil' : 'Portable simultaneous'}</a></li>
+        <li><a href={path('remote', lang)}>{lang === 'pt' ? 'Remota (RSI)' : 'Remote (RSI)'}</a></li>
+        <li><a href={path('consecutive', lang)}>{lang === 'pt' ? 'Consecutiva' : 'Consecutive'}</a></li>
+        <li><a href={path('conferences', lang)}>{lang === 'pt' ? 'Congressos' : 'Conferences'}</a></li>
+      </ul>
+    </nav>
+
+    <nav aria-label={s.footer.companyTitle}>
+      <h2 class="col-title">{s.footer.companyTitle}</h2>
+      <ul>
+        <li><a href={path('interpreters', lang)}>{s.nav.interpreters}</a></li>
+        <li><a href={path('events', lang)}>{s.nav.events}</a></li>
+        <li><a href={path('explainer', lang)}>{s.nav.explainer}</a></li>
+        <li><a href={path('privacy', lang)}>{s.privacy.title}</a></li>
+      </ul>
+    </nav>
+
+    <div>
+      <h2 class="col-title">{s.footer.contactTitle}</h2>
+      <ul>
+        <li><a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></li>
+        <li><a href={path('quote', lang)}>{s.nav.quote}</a></li>
+      </ul>
+      <p class="secondary legal">
+        {site.legal.razaoSocial}<br />
+        CNPJ {site.legal.cnpj}
+      </p>
+    </div>
+  </div>
+
+  <div class="shell base">
+    <p class="secondary">© {year} {site.brand}. {s.footer.rights}</p>
+    <p class="secondary area">{formatList(site.areaServed.slice(0, 6), lang)}…</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer { background: var(--brand-deep); padding-block: var(--space-l) var(--space-m); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: var(--space-l) var(--space-m);
+  }
+  .brand {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-1);
+  }
+  .tagline { margin-block-start: 0.5rem; max-width: 24ch; }
+  .col-title {
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 600;
+    margin-block-end: var(--space-s);
+    color: var(--page);
+  }
+  ul { list-style: none; padding: 0; display: grid; gap: 0.4rem; }
+  li a { font-size: var(--step--1); text-decoration: none; color: var(--page); }
+  li a:hover { color: var(--channel-on-dark); text-decoration: underline; }
+  .legal { margin-block-start: var(--space-m); font-size: var(--step--1); line-height: 1.5; }
+  .base {
+    margin-block-start: var(--space-l);
+    padding-block-start: var(--space-m);
+    border-block-start: 1px solid color-mix(in srgb, var(--mute) 30%, transparent);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s) var(--space-m);
+    justify-content: space-between;
+    font-size: var(--step--1);
+  }
+  .area { max-width: 46ch; }
+</style>

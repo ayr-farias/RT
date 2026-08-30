@@ -1,0 +1,101 @@
+---
+import type { Lang } from '@/data/site';
+import { interpreters } from '@/data/interpreters';
+import { path } from '@/i18n/routes';
+import { t, pairLabels } from '@/i18n/utils';
+import Base from '@/layouts/Base.astro';
+import Schema from '@/components/Schema.astro';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const s = t(lang);
+
+const seo = lang === 'pt'
+  ? { title: 'Intérprete inglês português em Recife',
+      description: 'Ayrton (APIC) e Lorena (ABRATES), intérpretes de conferência em Recife. Inglês ↔ português para os dois; espanhol com Lorena.' }
+  : { title: 'English–Portuguese interpreters in Recife',
+      description: 'Ayrton (APIC) and Lorena (ABRATES), conference interpreters in Recife. English ↔ Portuguese for both; Spanish with Lorena.' };
+---
+<Base lang={lang} routeKey="interpreters" title={seo.title} description={seo.description}>
+  <Schema slot="head" lang={lang} routeKey="interpreters" />
+
+  <div class="shell section">
+    <h1>{s.interpreters.title}</h1>
+    <p class="lede measure">{s.interpreters.intro}</p>
+
+    {interpreters.map((p) => (
+      <section class="person">
+        <figure>
+          <div class="placeholder" role="img" aria-label={p.name}>
+            <span>{p.name}</span>
+          </div>
+        </figure>
+        <div class="body stack-s">
+          <h2>{p.name}</h2>
+          <p class="assoc">{p.association.full[lang]}</p>
+          <p class="measure">{p.bio[lang]}</p>
+
+          <dl class="facts">
+            <div>
+              <dt>{s.interpreters.pairsLabel}</dt>
+              <dd>{p.pairs.map((x) => pairLabels[lang][x]).join(' · ')}</dd>
+            </div>
+            <div>
+              <dt>{s.interpreters.memberLabel}</dt>
+              <dd><a href={p.association.url} rel="noopener">{p.association.name}</a></dd>
+            </div>
+            <div>
+              <dt>{s.interpreters.sinceLabel}</dt>
+              <dd>{p.since}</dd>
+            </div>
+            <div>
+              <dt>{s.interpreters.eventsLabel}</dt>
+              <dd>{p.eventTypes[lang].join(' · ')}</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+    ))}
+
+    <aside class="cta">
+      <p><a class="btn btn--primary" href={path('quote', lang)}>{s.nav.quote}</a></p>
+    </aside>
+  </div>
+</Base>
+
+<style>
+  .lede { font-size: var(--step-1); margin-block-start: var(--space-m); }
+  .person {
+    margin-block-start: var(--space-xl);
+    display: grid;
+    gap: var(--space-l);
+    align-items: start;
+  }
+  @media (min-width: 50rem) {
+    .person { grid-template-columns: 0.75fr 1.25fr; }
+  }
+  figure { margin: 0; }
+  .placeholder {
+    aspect-ratio: 3 / 4;
+    background: var(--brand);
+    color: var(--mute-on-dark);
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+  }
+  .body h2 { font-size: var(--step-3); }
+  .assoc { font-family: var(--font-display); font-size: var(--step--1); color: var(--mute-on-light); }
+  .facts {
+    margin-block-start: var(--space-m);
+    display: grid;
+    gap: var(--space-s);
+    font-size: var(--step--1);
+    border-block-start: 1px solid var(--hairline);
+    padding-block-start: var(--space-m);
+  }
+  .facts > div { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  dt { font-family: var(--font-display); font-weight: 600; color: var(--mute-on-light); }
+  dt::after { content: ':'; }
+  dd { margin: 0; }
+  .cta { margin-block-start: var(--space-xl); }
+</style>

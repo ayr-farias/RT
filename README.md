@@ -1,0 +1,115 @@
+# Recife Translators
+
+Static Astro site for a two-person simultaneous interpretation business in
+Recife, Pernambuco. Portuguese at the root, English under `/en/`, 24 routes.
+
+```bash
+npm install
+npm run dev      # http://localhost:4321
+npm run build    # astro check && astro build → dist/
+npm run preview
+```
+
+## Before this goes live
+
+Everything unresolved lives in **`src/data/site.ts`**, marked `TODO(open-item-N)`
+against §16 of the build brief. Nothing else needs editing to fill them in.
+
+| # | Item | Where |
+|---|---|---|
+| 1 | Domain | `site.origin` — drives canonicals, hreflang, JSON-LD `@id` |
+| 2 | Transmitter count | `site.equipment.transmitters` — see note below |
+| 3 | Travel radius | `site.areaServed` — visible copy **and** JSON-LD |
+| 4 | Event list | `src/content/events/*.md` — currently sample data |
+| 5 | Media inventory | `public/media/` — currently empty, see below |
+| 6 | WhatsApp number | `site.contact.whatsappE164` |
+| 7 | Address | `site.address.street` — `null` publishes Recife-level only |
+| 8 | Spanish locale | Not built. Spanish is listed as Lorena's capability. |
+| 9 | Response time | `site.contact.responseTimeHours` — used in copy *and* the form confirmation |
+
+Also placeholder: `razaoSocial` and `cnpj` in `site.legal`, and the review date
+in `src/components/pages/Privacy.astro`.
+
+**Transmitter count (open item 2)** is wired as a guard, not just a number.
+`canRunTwoChannels` in `site.ts` is `false` while `transmitters` is `null`, so
+no copy can claim English and Spanish running simultaneously in one room until
+that figure is known.
+
+## The confidentiality gate
+
+`src/content.config.ts` makes a leak a build failure, not a review item:
+
+- An event with `photo` but without `photoConsent: true` **fails the build**
+  with "Photo present without recorded consent". Verified.
+- A `client` name renders only when `clientPublic: true`. Otherwise the entry
+  renders as sector, city, year — which still carries weight.
+
+Apply the same discipline to hero footage: where permission is unclear, use
+footage in which nothing identifiable is audible or legible.
+
+## Media
+
+`public/media/` is empty. The site is built to degrade cleanly without it —
+portraits render as labelled placeholder blocks and the hero runs without video.
+To add real media:
+
+- **Hero video** — pass `video={{ mp4, webm, poster }}` to `<Hero>` in
+  `src/components/pages/Home.astro`. ≤6s, silent, ≤2.5 MB total, poster set.
+- **Portraits** — `/media/ayrton.jpg`, `/media/lorena.jpg` (paths already in
+  `src/data/interpreters.ts`); swap the `.placeholder` divs for `<Image>`.
+- **Longer reel** — `<VideoFacade>` is built and unused; nothing loads from
+  YouTube until the click.
+
+## Deploy — Cloudflare Pages
+
+Build command `npm run build`, output directory `dist`. `functions/api/quote.ts`
+is picked up automatically as a Pages Function at `/api/quote`.
+
+Set these in Pages → Settings → Environment variables (see `.env.example`):
+`RESEND_API_KEY`, `QUOTE_TO`, `QUOTE_FROM`.
+
+The form posts JSON when JS is available and falls back to a native POST that
+returns a real HTML confirmation page when it is not. Spam handling is a
+honeypot plus a submission-time trap — no CAPTCHA on a lead form.
+
+## Deviations from the brief
+
+- **`i18n.fallback` removed.** §7 specifies `fallback: { en: 'pt' }`. With full
+  English coverage that emitted 11 redirect stubs (`/en/contato/`,
+  `/en/servicos/…`) which landed in the sitemap carrying hreflang alternates —
+  duplicate English URLs competing with the real ones. Re-enable only if a
+  locale goes partial again.
+- **Palette taken from the live site, not from §11.** The brief specifies a
+  viridian-and-gold palette; the existing recifetranslators.com.br is indigo, so
+  the tokens are built from its actual colours — `#345895` (its dominant
+  indigo), `#282C33` (its slate panels, reused as body ink) and its blue-grey
+  muted tones. The accent is **not** the live site's magenta `#C778DD`: it is an
+  aqua `#2BB8C4` drawn from the same blue family, filling the role gold had in
+  the brief.
+
+  `#345895` is a mid-tone, so no single accent value clears 4.5:1 on both the
+  page and the indigo. AA (§12) is therefore enforced per background:
+  `--channel` at full strength is for fills, rules and large text, while
+  `--channel-on-dark`, `--channel-on-light`, `--mute-on-dark` and
+  `--mute-on-light` carry small text. All 24 pages were audited against the
+  rendered DOM: zero contrast failures.
+- **Astro 7, not 5.** `src/content.config.ts` is unchanged in shape, but Zod is
+  v4 — `z` is imported from `zod` directly rather than from `astro:content`,
+  whose re-export is deprecated.
+
+## Structure
+
+```
+src/
+  content.config.ts     Zod schemas; the consent gate lives here
+  data/site.ts          all open items, one file
+  data/interpreters.ts  the two interpreters, pairs stated per person
+  i18n/routes.ts        canonical route table — nav, switcher, hreflang, breadcrumbs
+  i18n/{pt,en}.ts       UI strings; en.ts must satisfy pt.ts's type
+  components/pages/     one body per page, takes `lang`
+  pages/                24 thin route files
+functions/api/quote.ts  Cloudflare Pages Function
+```
+
+Three islands only: mobile nav, quote form, video facade. Everything else is
+static HTML — 253 bytes of JS on most pages, 1.6 KB on the quote page.

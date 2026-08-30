@@ -1,0 +1,26 @@
+---
+import type { Lang } from '@/data/site';
+import { path, type RouteKey } from '@/i18n/routes';
+import { t } from '@/i18n/utils';
+
+interface Props { lang: Lang; trail: { name: string; key: RouteKey }[]; current: string; }
+const { lang, trail, current } = Astro.props;
+const s = t(lang);
+---
+<nav class="crumbs" aria-label={s.common.breadcrumb}>
+  <ol>
+    {trail.map((c) => (
+      <li><a href={path(c.key, lang)}>{c.name}</a></li>
+    ))}
+    <li aria-current="page">{current}</li>
+  </ol>
+</nav>
+
+<style>
+  .crumbs { font-size: var(--step--1); font-family: var(--font-display); }
+  ol { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  li + li::before { content: '/'; color: var(--mute-on-light); margin-inline-end: 0.4rem; }
+  li[aria-current] { color: var(--mute-on-light); }
+  a { text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>

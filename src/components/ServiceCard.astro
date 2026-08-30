@@ -1,0 +1,92 @@
+---
+import type { Lang } from '@/data/site';
+import { t, pairLabels } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+  href: string;
+  title: string;
+  summary: string;
+  inHouse: boolean;
+  maxListeners?: number;
+  requiresEquipment: boolean;
+  pairs: readonly string[];
+  platforms?: readonly string[];
+}
+const {
+  lang, href, title, summary, inHouse, maxListeners, requiresEquipment, pairs, platforms,
+} = Astro.props;
+const s = t(lang);
+---
+<article class="card" data-in-house={String(inHouse)}>
+  <p class="tier">
+    {inHouse ? s.services.inHouse : s.services.partnered}
+  </p>
+  <h3><a href={href}>{title}</a></h3>
+  <p class="summary">{summary}</p>
+
+  <dl class="facts">
+    {maxListeners && (
+      <div>
+        <dt class="visually-hidden">{s.services.upTo(maxListeners)}</dt>
+        <dd>{s.services.upTo(maxListeners)}</dd>
+      </div>
+    )}
+    {!requiresEquipment && (
+      <div><dt class="visually-hidden">—</dt><dd>{s.services.noEquipment}</dd></div>
+    )}
+    <div>
+      <dt>{s.services.pairsLabel}</dt>
+      <dd>{pairs.map((p) => pairLabels[lang][p] ?? p).join(' · ')}</dd>
+    </div>
+    {platforms && platforms.length > 0 && (
+      <div>
+        <dt>{s.services.platformsLabel}</dt>
+        <dd>{platforms.join(' · ')}</dd>
+      </div>
+    )}
+  </dl>
+
+  <a class="more" href={href}>{s.services.readMore}</a>
+</article>
+
+<style>
+  .card {
+    border-block-start: 3px solid var(--channel);
+    padding-block-start: var(--space-m);
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+  }
+  /* Partnered tiers are legible as a different rank, not hidden (§5). */
+  .card[data-in-house='false'] { border-block-start-color: var(--mute); }
+  .tier {
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--mute-on-light);
+  }
+  h3 { font-size: var(--step-2); }
+  h3 a { text-decoration: none; }
+  h3 a:hover { color: var(--brand); text-decoration: underline; }
+  .summary { max-width: 44ch; }
+  .facts {
+    display: grid;
+    gap: 0.35rem;
+    margin-block-start: 0.4rem;
+    font-size: var(--step--1);
+  }
+  .facts > div { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  dt { font-family: var(--font-display); font-weight: 600; color: var(--mute-on-light); }
+  dt::after { content: ':'; }
+  dt.visually-hidden::after { content: none; }
+  dd { margin: 0; }
+  .more {
+    margin-block-start: 0.5rem;
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--brand);
+    justify-self: start;
+  }
+</style>

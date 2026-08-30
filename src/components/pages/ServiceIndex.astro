@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+import type { Lang } from '@/data/site';
+import { path } from '@/i18n/routes';
+import { t } from '@/i18n/utils';
+import Base from '@/layouts/Base.astro';
+import ServiceCard from '@/components/ServiceCard.astro';
+import Schema from '@/components/Schema.astro';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const s = t(lang);
+
+// Ordered by how much of the delivery they control (§5).
+const services = (await getCollection('services'))
+  .filter((e) => e.data.lang === lang)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const seo = lang === 'pt'
+  ? { title: 'Serviços de interpretação — Recife Translators',
+      description: 'Simultânea portátil, remota, consecutiva e congressos com cabine. O que é equipamento próprio e o que é parceiro, dito com clareza.' }
+  : { title: 'Interpretation services — Recife Translators',
+      description: 'Portable simultaneous, remote, consecutive and conferences with a booth. What is our own equipment and what is partnered, stated plainly.' };
+---
+<Base lang={lang} routeKey="services" title={seo.title} description={seo.description}>
+  <Schema slot="head" lang={lang} routeKey="services" />
+
+  <div class="shell section">
+    <h1>{s.services.title}</h1>
+    <p class="measure lede">{s.services.intro}</p>
+
+    <div class="cards">
+      {services.map((sv) => (
+        <ServiceCard
+          lang={lang}
+          href={path(sv.data.key as 'portable', lang)}
+          title={sv.data.title}
+          summary={sv.data.summary}
+          inHouse={sv.data.inHouse}
+          maxListeners={sv.data.maxListeners}
+          requiresEquipment={sv.data.requiresEquipment}
+          pairs={sv.data.pairs}
+          platforms={sv.data.platforms}
+        />
+      ))}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .lede { font-size: var(--step-1); margin-block-start: var(--space-m); }
+  .cards {
+    margin-block-start: var(--space-xl);
+    display: grid;
+    gap: var(--space-l) var(--space-m);
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  }
+</style>

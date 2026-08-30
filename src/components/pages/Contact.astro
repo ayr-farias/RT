@@ -1,0 +1,100 @@
+---
+import type { Lang } from '@/data/site';
+import { site, whatsappLink } from '@/data/site';
+import { path } from '@/i18n/routes';
+import { t } from '@/i18n/utils';
+import Base from '@/layouts/Base.astro';
+import Schema from '@/components/Schema.astro';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const s = t(lang);
+
+const seo = lang === 'pt'
+  ? { title: 'Contato — Recife Translators',
+      description: 'WhatsApp, e-mail, CNPJ e área de atendimento. Intérpretes de conferência em Recife, Pernambuco.' }
+  : { title: 'Contact — Recife Translators',
+      description: 'WhatsApp, email, CNPJ and service area. Conference interpreters in Recife, Pernambuco.' };
+---
+<Base lang={lang} routeKey="contact" title={seo.title} description={seo.description}>
+  <Schema slot="head" lang={lang} routeKey="contact" />
+
+  <div class="shell section">
+    <h1>{s.contact.title}</h1>
+
+    <div class="cols">
+      <section class="stack-s">
+        <h2>{s.contact.whatsapp}</h2>
+        <p><a class="big" href={whatsappLink(lang)} rel="noopener">{site.contact.whatsappDisplay}</a></p>
+        <p class="secondary">{s.contact.responseTitle}: {s.contact.responseBody}</p>
+
+        <h2 class="spaced">{s.contact.email}</h2>
+        <p><a class="big" href={`mailto:${site.contact.email}`}>{site.contact.email}</a></p>
+
+        <p class="spaced">
+          <a class="btn btn--primary" href={path('quote', lang)}>{s.nav.quote}</a>
+        </p>
+      </section>
+
+      <section>
+        <h2>{s.contact.legalTitle}</h2>
+        <dl class="legal">
+          <div>
+            <dt>{s.contact.razaoSocial}</dt>
+            <dd>{site.legal.razaoSocial}</dd>
+          </div>
+          <div>
+            <dt>{s.contact.cnpj}</dt>
+            <dd>{site.legal.cnpj}</dd>
+          </div>
+          <div>
+            <dt>{s.contact.nf}</dt>
+            <dd>{s.contact.nfYes}</dd>
+          </div>
+          <div>
+            <dt>{lang === 'pt' ? 'Base' : 'Based in'}</dt>
+            <dd>
+              {site.address.street && <>{site.address.street}<br /></>}
+              {site.address.locality} — {site.address.region}, {lang === 'pt' ? 'Brasil' : 'Brazil'}
+            </dd>
+          </div>
+        </dl>
+
+        <h2 class="spaced">{s.contact.areaTitle}</h2>
+        <p class="secondary">{s.contact.areaBody}</p>
+        {/* A literal city list: agencies filter on geography before reading (§3). */}
+        <ul class="cities">
+          {site.areaServed.map((c) => <li>{c}</li>)}
+        </ul>
+      </section>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .cols {
+    margin-block-start: var(--space-xl);
+    display: grid;
+    gap: var(--space-xl);
+  }
+  @media (min-width: 50rem) { .cols { grid-template-columns: 1fr 1fr; gap: var(--space-l); } }
+  h2 { font-size: var(--step-1); }
+  .spaced { margin-block-start: var(--space-l); }
+  .big { font-family: var(--font-display); font-size: var(--step-2); font-weight: 600; }
+  .legal { display: grid; gap: var(--space-s); margin-block-start: var(--space-m); }
+  .legal > div { display: grid; gap: 0.15rem; }
+  dt { font-family: var(--font-display); font-size: var(--step--1); font-weight: 600; color: var(--mute-on-light); }
+  dd { margin: 0; }
+  .cities {
+    list-style: none;
+    padding: 0;
+    margin-block-start: var(--space-s);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.75rem;
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+  }
+  .cities li::after { content: ' ·'; color: var(--channel); }
+  .cities li:last-child::after { content: none; }
+</style>

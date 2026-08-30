@@ -1,0 +1,137 @@
+---
+import type { Lang } from '@/data/site';
+import { whatsappLink } from '@/data/site';
+import { path, alternate } from '@/i18n/routes';
+import { t } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+  /** Optional silent loop, ≤6s, ≤2.5MB (§10). Falls back to the poster. */
+  video?: { mp4: string; webm?: string; poster: string };
+}
+const { lang, video } = Astro.props;
+const s = t(lang);
+
+// The hero renders the same claim twice — the primary language, then the other
+// arriving a beat behind it, as though a second interpretation channel were
+// running just off the first (§11). The trailing line is the language switch.
+const primary = lang === 'pt' ? s.home.heroPt : s.home.heroEn;
+const second = lang === 'pt' ? s.home.heroEn : s.home.heroPt;
+const other = alternate('home', lang);
+---
+<section class="hero on-dark">
+  {video && (
+    <div class="hero-media" aria-hidden="true">
+      <video
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        poster={video.poster}
+        width="1920"
+        height="1080"
+      >
+        {video.webm && <source src={video.webm} type="video/webm" />}
+        <source src={video.mp4} type="video/mp4" />
+      </video>
+    </div>
+  )}
+
+  <div class="shell hero-inner">
+    <h1 class="channels">
+      <span class="channel channel--primary" lang={lang === 'pt' ? 'pt-BR' : 'en'}>
+        {primary}
+      </span>
+      <a
+        class="channel channel--second"
+        href={other.href}
+        lang={other.lang === 'pt' ? 'pt-BR' : 'en'}
+        hreflang={other.lang === 'pt' ? 'pt-BR' : 'en'}
+      >
+        <span class="tick" aria-hidden="true"></span>
+        {second}
+      </a>
+    </h1>
+
+    <p class="sub measure">{s.home.heroSub}</p>
+
+    <div class="cta">
+      <a class="btn btn--primary" href={path('quote', lang)}>{s.home.heroCtaQuote}</a>
+      <a class="btn btn--secondary" href={whatsappLink(lang)} rel="noopener">
+        {s.home.heroCtaWhats}
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    background: var(--brand-deep);
+    padding-block: clamp(3.5rem, 11vw, 7.5rem);
+    overflow: hidden;
+  }
+  .hero-media { position: absolute; inset: 0; }
+  .hero-media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.28;
+  }
+  .hero-inner { position: relative; }
+
+  .channels { display: grid; gap: 0.35em; }
+  .channel { display: block; }
+  .channel--primary {
+    font-stretch: 115%;
+    color: var(--page);
+  }
+  /* The second channel: same claim, muted, offset, a beat later. */
+  .channel--second {
+    position: relative;
+    font-size: 0.52em;
+    font-stretch: 100%;
+    font-weight: 500;
+    color: var(--mute-on-dark);
+    text-decoration: none;
+    padding-inline-start: 1.15em;
+    max-width: 42ch;
+  }
+  .channel--second:hover { color: var(--channel-on-dark); }
+  .channel--second:hover .tick { background: var(--channel); }
+  .tick {
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block: 0.18em 0.22em;
+    width: 3px;
+    background: color-mix(in srgb, var(--channel) 70%, transparent);
+  }
+
+  .sub {
+    margin-block-start: var(--space-m);
+    color: var(--page);
+    font-size: var(--step-1);
+  }
+  .cta {
+    margin-block-start: var(--space-l);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+  }
+
+  /* The single orchestrated moment on the site (§11). */
+  @media (prefers-reduced-motion: no-preference) {
+    .channel--primary { animation: rise 620ms cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+    .channel--second { animation: rise 620ms cubic-bezier(0.2, 0.7, 0.3, 1) 420ms both; }
+    .tick { animation: tick 500ms ease 420ms both; }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(0.35em); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes tick {
+    from { transform: scaleY(0); }
+    to   { transform: scaleY(1); }
+  }
+</style>

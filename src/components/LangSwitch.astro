@@ -1,0 +1,37 @@
+---
+import type { Lang } from '@/data/site';
+import { alternate, type RouteKey } from '@/i18n/routes';
+import { t } from '@/i18n/utils';
+
+interface Props { lang: Lang; routeKey: RouteKey; }
+const { lang, routeKey } = Astro.props;
+const s = t(lang);
+// Always the equivalent page, never the homepage (§7).
+const other = alternate(routeKey, lang);
+---
+<a
+  class="lang-switch"
+  href={other.href}
+  hreflang={other.lang === 'pt' ? 'pt-BR' : 'en'}
+  lang={other.lang === 'pt' ? 'pt-BR' : 'en'}
+  aria-label={s.switchToAria}
+>
+  {s.switchTo}
+</a>
+
+<style>
+  .lang-switch {
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-decoration: none;
+    padding: 0.4em 0.7em;
+    border: 1px solid var(--hairline);
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .lang-switch:hover {
+    border-color: var(--channel);
+    color: var(--channel-on-light);
+  }
+</style>

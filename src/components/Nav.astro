@@ -1,0 +1,144 @@
+---
+import type { Lang } from '@/data/site';
+import { site } from '@/data/site';
+import { path, navOrder, type RouteKey } from '@/i18n/routes';
+import { t } from '@/i18n/utils';
+import LangSwitch from './LangSwitch.astro';
+
+interface Props { lang: Lang; routeKey: RouteKey; }
+const { lang, routeKey } = Astro.props;
+const s = t(lang);
+
+const labels: Record<string, string> = {
+  services: s.nav.services,
+  explainer: s.nav.explainer,
+  interpreters: s.nav.interpreters,
+  events: s.nav.events,
+  contact: s.nav.contact,
+};
+---
+<header class="site-header">
+  <div class="shell bar">
+    <a class="brand" href={path('home', lang)}>
+      {site.brand}
+    </a>
+
+    <button
+      class="burger"
+      type="button"
+      aria-expanded="false"
+      aria-controls="primary-nav"
+      data-nav-toggle
+    >
+      <span class="visually-hidden">{s.nav.menu}</span>
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 6h18M3 12h18M3 18h18" />
+      </svg>
+    </button>
+
+    <nav id="primary-nav" class="nav" aria-label={s.nav.menu}>
+      <ul class="nav-list">
+        {navOrder.map((key) => (
+          <li>
+            <a
+              href={path(key, lang)}
+              aria-current={key === routeKey ? 'page' : undefined}
+            >
+              {labels[key]}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <div class="nav-actions">
+        <LangSwitch lang={lang} routeKey={routeKey} />
+        <a class="btn btn--primary btn--sm" href={path('quote', lang)}>{s.nav.quote}</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-block-end: 1px solid var(--hairline);
+    background: var(--page);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-m);
+    padding-block: 1rem;
+  }
+  .brand {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-stretch: 108%;
+    font-size: var(--step-1);
+    text-decoration: none;
+    color: var(--brand);
+    white-space: nowrap;
+  }
+  .nav { display: flex; align-items: center; gap: var(--space-m); }
+  .nav-list {
+    display: flex;
+    align-items: center;
+    gap: var(--space-m);
+    list-style: none;
+    padding: 0;
+  }
+  .nav-list a {
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .nav-list a:hover { color: var(--channel-on-light); text-decoration: underline; }
+  .nav-list a[aria-current='page'] {
+    color: var(--brand);
+    text-decoration: underline;
+    text-decoration-color: var(--channel);
+    text-decoration-thickness: 2px;
+  }
+  .nav-actions { display: flex; align-items: center; gap: var(--space-s); }
+  .btn--sm { font-size: var(--step--1); padding: 0.5em 0.9em; }
+  .burger {
+    display: none;
+    background: none;
+    border: 1px solid var(--hairline);
+    border-radius: 2px;
+    padding: 0.4rem;
+    cursor: pointer;
+    color: var(--brand);
+  }
+
+  @media (max-width: 62rem) {
+    .burger { display: block; }
+    .nav {
+      display: none;
+      position: absolute;
+      inset-inline: 0;
+      background: var(--page);
+      border-block-end: 1px solid var(--hairline);
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-m);
+      padding: var(--space-m) var(--gutter);
+      z-index: 20;
+    }
+    .site-header { position: relative; }
+    .nav[data-open='true'] { display: flex; }
+    .nav-list { flex-direction: column; align-items: flex-start; gap: var(--space-s); }
+    .nav-list a { font-size: var(--step-0); }
+  }
+</style>
+
+<script>
+  // Island 1 of 3: mobile nav (§12 budget).
+  const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+  const nav = document.getElementById('primary-nav');
+  toggle?.addEventListener('click', () => {
+    const open = nav?.getAttribute('data-open') === 'true';
+    nav?.setAttribute('data-open', String(!open));
+    toggle.setAttribute('aria-expanded', String(!open));
+  });
+</script>

@@ -1,0 +1,41 @@
+---
+import type { Lang } from '@/data/site';
+import { whatsappLink } from '@/data/site';
+import { t } from '@/i18n/utils';
+import Base from '@/layouts/Base.astro';
+import QuoteForm from '@/components/QuoteForm.astro';
+import Schema from '@/components/Schema.astro';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const s = t(lang);
+
+const seo = lang === 'pt'
+  ? { title: 'Pedir orçamento de tradução simultânea',
+      description: 'Formulário de orçamento para tradução simultânea, consecutiva e remota em Recife e Pernambuco. Resposta com número, não com cinco perguntas.' }
+  : { title: 'Request an interpretation quote',
+      description: 'Quote form for simultaneous, consecutive and remote interpreting in Recife and Pernambuco. A reply with a number, not five more questions.' };
+---
+<Base lang={lang} routeKey="quote" title={seo.title} description={seo.description}>
+  <Schema slot="head" lang={lang} routeKey="quote" />
+
+  <div class="shell section">
+    <div class="intro">
+      <h1>{s.quote.title}</h1>
+      <p class="lede measure">{s.quote.intro}</p>
+      <p class="alt secondary measure">
+        {lang === 'pt'
+          ? 'Só quer conferir uma data? '
+          : 'Only checking a date? '}
+        <a href={whatsappLink(lang)} rel="noopener">{s.home.heroCtaWhats}</a>.
+      </p>
+    </div>
+    <QuoteForm lang={lang} />
+  </div>
+</Base>
+
+<style>
+  .intro { margin-block-end: var(--space-xl); }
+  .lede { font-size: var(--step-1); margin-block-start: var(--space-m); }
+  .alt { margin-block-start: var(--space-m); }
+</style>

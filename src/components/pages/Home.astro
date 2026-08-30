@@ -1,0 +1,200 @@
+---
+import { getCollection } from 'astro:content';
+import type { Lang } from '@/data/site';
+import { site, whatsappLink } from '@/data/site';
+import { path } from '@/i18n/routes';
+import { t, formatList } from '@/i18n/utils';
+import Base from '@/layouts/Base.astro';
+import Hero from '@/components/Hero.astro';
+import TrustStrip from '@/components/TrustStrip.astro';
+import Schema from '@/components/Schema.astro';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const s = t(lang);
+
+const services = (await getCollection('services'))
+  .filter((e) => e.data.lang === lang)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const seo = lang === 'pt'
+  ? {
+      title: 'Tradução simultânea em Recife — Recife Translators',
+      description:
+        'Intérpretes de conferência em Recife com equipamento próprio de tradução simultânea, 30 receptores e quatro plataformas de RSI. CNPJ e nota fiscal.',
+    }
+  : {
+      title: 'Simultaneous interpretation in Recife — Recife Translators',
+      description:
+        'Conference interpreters in Recife with our own simultaneous interpretation equipment, 30 receivers and four RSI platforms. Registered CNPJ, nota fiscal issued.',
+    };
+---
+<Base lang={lang} routeKey="home" title={seo.title} description={seo.description}>
+  <Schema slot="head" lang={lang} routeKey="home" />
+
+  <Hero lang={lang} />
+  <TrustStrip lang={lang} />
+
+  {/* The pair — the claim agencies care about most (§5). */}
+  <section class="section">
+    <div class="shell split">
+      <div class="stack">
+        <p class="eyebrow">{lang === 'pt' ? 'A dupla' : 'The pair'}</p>
+        <h2>{s.home.pair.title}</h2>
+        <p class="measure">{s.home.pair.body}</p>
+        <p><a class="btn btn--secondary" href={path('interpreters', lang)}>{s.nav.interpreters}</a></p>
+      </div>
+      <figure class="portrait">
+        <div class="placeholder" role="img" aria-label={s.home.pair.alt}>
+          <span>{s.home.pair.alt}</span>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  {/* What we own — the structural fact the site is bounded by (§3). */}
+  <section class="section on-dark">
+    <div class="shell split">
+      <div class="stack">
+        <p class="eyebrow">{lang === 'pt' ? 'Equipamento' : 'Equipment'}</p>
+        <h2>{s.home.owned.title}</h2>
+        <p class="measure">{s.home.owned.body}</p>
+        <p class="measure secondary">{s.home.owned.scaleUp}</p>
+        <p><a class="btn btn--primary" href={path('portable', lang)}>{s.home.owned.cta}</a></p>
+      </div>
+      <div class="counter" aria-hidden="true">
+        <span class="n">{site.equipment.receivers}</span>
+        <span class="l">{lang === 'pt' ? 'receptores nossos' : 'receivers we own'}</span>
+      </div>
+    </div>
+  </section>
+
+  {/* Remote — four platform names as text, high on the page (§3). */}
+  <section class="section--tight section">
+    <div class="shell stack">
+      <p class="eyebrow">{lang === 'pt' ? 'Remoto' : 'Remote'}</p>
+      <h2>{s.home.remote.title}</h2>
+      <p class="measure">{s.home.remote.body}</p>
+      <ul class="platforms">
+        {site.rsiPlatforms.map((p) => <li>{p}</li>)}
+      </ul>
+      <p><a class="btn btn--secondary" href={path('remote', lang)}>{s.home.remote.cta}</a></p>
+    </div>
+  </section>
+
+  {/* Service index preview */}
+  <section class="section--tight section">
+    <div class="shell">
+      <h2>{s.services.title}</h2>
+      <ul class="svc">
+        {services.map((sv) => (
+          <li>
+            <a href={path(sv.data.key as 'portable', lang)}>
+              <span class="svc-title">{sv.data.title}</span>
+              <span class="svc-tier secondary">
+                {sv.data.inHouse ? s.services.inHouse : s.services.partnered}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {/* Two contact paths, neither hidden behind the other (§5). */}
+  <section class="section on-dark">
+    <div class="shell">
+      <h2>{s.home.contactSplit.title}</h2>
+      <div class="paths">
+        <div class="stack-s">
+          <h3>{s.home.contactSplit.whatsTitle}</h3>
+          <p class="secondary measure">{s.home.contactSplit.whatsBody}</p>
+          <p><a class="btn btn--secondary" href={whatsappLink(lang)} rel="noopener">
+            {s.home.heroCtaWhats}
+          </a></p>
+        </div>
+        <div class="stack-s">
+          <h3>{s.home.contactSplit.formTitle}</h3>
+          <p class="secondary measure">{s.home.contactSplit.formBody}</p>
+          <p><a class="btn btn--primary" href={path('quote', lang)}>{s.nav.quote}</a></p>
+        </div>
+      </div>
+      <p class="area secondary">{formatList(site.areaServed, lang)}.</p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .split {
+    display: grid;
+    gap: var(--space-l);
+    grid-template-columns: 1fr;
+    align-items: center;
+  }
+  @media (min-width: 55rem) {
+    .split { grid-template-columns: 1.15fr 0.85fr; }
+  }
+  .portrait { margin: 0; }
+  .placeholder {
+    aspect-ratio: 4 / 3;
+    background: var(--brand);
+    color: var(--mute-on-dark);
+    display: grid;
+    place-items: center;
+    padding: var(--space-m);
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+  }
+  .counter { text-align: center; }
+  .counter .n {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(5rem, 18vw, 11rem);
+    font-stretch: 118%;
+    font-weight: 700;
+    line-height: 0.85;
+    /* --channel at full strength is 2.94 on --brand, just under the 3.0
+       large-text threshold. The on-dark variant is the readable one. */
+    color: var(--channel-on-dark);
+  }
+  .counter .l {
+    display: block;
+    margin-block-start: var(--space-s);
+    font-family: var(--font-display);
+    color: var(--mute-on-dark);
+  }
+  .platforms {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s) var(--space-m);
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-weight: 600;
+    color: var(--brand);
+  }
+  .svc { list-style: none; padding: 0; display: grid; margin-block-start: var(--space-m); }
+  .svc li { border-block-start: 1px solid var(--hairline); }
+  .svc li:last-child { border-block-end: 1px solid var(--hairline); }
+  .svc a {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-s);
+    padding-block: var(--space-m);
+    text-decoration: none;
+  }
+  .svc a:hover .svc-title { color: var(--brand); text-decoration: underline; }
+  .svc-title { font-family: var(--font-display); font-weight: 600; font-size: var(--step-1); }
+  .svc-tier { font-family: var(--font-display); font-size: var(--step--1); }
+  .paths {
+    display: grid;
+    gap: var(--space-l);
+    margin-block-start: var(--space-m);
+  }
+  @media (min-width: 45rem) { .paths { grid-template-columns: 1fr 1fr; } }
+  .paths h3 { font-size: var(--step-1); }
+  .area { margin-block-start: var(--space-l); font-size: var(--step--1); }
+</style>

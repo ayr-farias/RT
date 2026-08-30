@@ -1,0 +1,17 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# local env — never commit RESEND_API_KEY
+.env
+.env.production
+.dev.vars
+
+# macOS
+.DS_Store
+
+# logs
+npm-debug.log*

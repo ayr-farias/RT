@@ -1,0 +1,21 @@
+{
+  "name": "recife-translators",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "check": "astro check",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.2.9",
+    "sharp": "^0.35.4",
+    "typescript": "^6.0.3",
+    "zod": "^4.5.4"
+  }
+}

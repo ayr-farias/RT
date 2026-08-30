@@ -1,0 +1,91 @@
+---
+import { getCollection } from 'astro:content';
+import type { Lang } from '@/data/site';
+import { path } from '@/i18n/routes';
+import { t } from '@/i18n/utils';
+import Base from '@/layouts/Base.astro';
+import FaqList from '@/components/FaqList.astro';
+import Schema from '@/components/Schema.astro';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const s = t(lang);
+
+const items = (await getCollection('faq'))
+  .filter((e) => e.data.lang === lang && e.data.page === 'booth-or-portable')
+  .sort((a, b) => a.data.order - b.data.order);
+
+/**
+ * The FAQPage markup is generated from the same entries that render on the
+ * page, so the structured data and the visible text cannot drift (§9).
+ * Answers are the rendered markdown reduced to plain text.
+ */
+const faqForSchema = await Promise.all(
+  items.map(async (e) => ({
+    question: e.data.question,
+    answer: e.body
+      ?.replace(/^---[\s\S]*?---/, '')
+      .replace(/[*_`#>]/g, '')
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+      .replace(/\s+/g, ' ')
+      .trim() ?? '',
+  })),
+);
+
+const seo = lang === 'pt'
+  ? { title: 'Preciso de cabine para tradução simultânea?',
+      description: 'As seis perguntas que aparecem em toda primeira conversa sobre tradução simultânea: cabine ou portátil, quantos intérpretes, quantos receptores e do que depende o preço.' }
+  : { title: 'Do I need a booth for simultaneous interpretation?',
+      description: 'The six questions that come up in every first conversation about simultaneous interpretation: booth or portable, how many interpreters, how many receivers, and what sets the price.' };
+---
+<Base lang={lang} routeKey="explainer" title={seo.title} description={seo.description}>
+  <Schema slot="head" lang={lang} routeKey="explainer" faq={faqForSchema} />
+
+  <div class="shell section">
+    <h1 class="measure">{s.explainer.title}</h1>
+    <p class="lede measure">{s.explainer.intro}</p>
+
+    <nav class="toc" aria-label={s.explainer.tocLabel}>
+      <h2>{s.explainer.tocLabel}</h2>
+      <ol>
+        {items.map((e) => (
+          <li><a href={`#${e.id.split('/').pop()}`}>{e.data.question}</a></li>
+        ))}
+      </ol>
+    </nav>
+
+    <FaqList items={items} />
+
+    <aside class="cta">
+      <p class="measure">{lang === 'pt'
+        ? 'Se ainda ficou dúvida sobre qual formato o seu evento pede, descreva o evento no formulário. A resposta vem com a recomendação, mesmo quando ela for "aqui você precisa de cabine".'
+        : 'If you are still unsure which format your event calls for, describe it in the form. The reply comes with a recommendation, including when that recommendation is "this one needs a booth".'}</p>
+      <p><a class="btn btn--primary" href={path('quote', lang)}>{s.nav.quote}</a></p>
+    </aside>
+  </div>
+</Base>
+
+<style>
+  .lede { font-size: var(--step-1); margin-block-start: var(--space-m); }
+  .toc {
+    margin-block: var(--space-xl);
+    border-block: 1px solid var(--hairline);
+    padding-block: var(--space-m);
+  }
+  .toc h2 {
+    font-size: var(--step--1);
+    font-family: var(--font-display);
+    color: var(--mute-on-light);
+    margin-block-end: var(--space-s);
+  }
+  .toc ol { padding-inline-start: 1.1rem; display: grid; gap: 0.3rem; max-width: var(--measure); }
+  .toc a { text-decoration: none; }
+  .toc a:hover { text-decoration: underline; color: var(--brand); }
+  .cta {
+    margin-block-start: var(--space-xl);
+    border-block-start: 3px solid var(--channel);
+    padding-block-start: var(--space-m);
+    display: grid;
+    gap: var(--space-m);
+  }
+</style>

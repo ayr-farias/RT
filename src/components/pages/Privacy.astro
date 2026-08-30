@@ -1,0 +1,153 @@
+---
+import type { Lang } from '@/data/site';
+import { site } from '@/data/site';
+import { t } from '@/i18n/utils';
+import Base from '@/layouts/Base.astro';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const s = t(lang);
+
+/** TODO: set to the date this text is actually reviewed and published. */
+const updated = '2026-01-01';
+const updatedLabel = new Date(updated).toLocaleDateString(lang === 'pt' ? 'pt-BR' : 'en-GB', {
+  year: 'numeric', month: 'long', day: 'numeric',
+});
+
+const seo = lang === 'pt'
+  ? { title: 'Política de privacidade — Recife Translators',
+      description: 'Como tratamos os dados enviados pelo formulário de orçamento, conforme a LGPD.' }
+  : { title: 'Privacy policy — Recife Translators',
+      description: 'How we handle data submitted through the quote form, under Brazil’s LGPD.' };
+---
+<Base lang={lang} routeKey="privacy" title={seo.title} description={seo.description}>
+  <div class="shell section">
+    <h1>{s.privacy.title}</h1>
+    <p class="secondary">{s.privacy.updated}: {updatedLabel}</p>
+
+    <div class="prose measure">
+      {lang === 'pt' ? (
+        <>
+          <h2>Quem é o controlador</h2>
+          <p>
+            O controlador dos dados pessoais tratados neste site é
+            <strong> {site.legal.razaoSocial}</strong>, inscrita no CNPJ sob o nº
+            {' '}{site.legal.cnpj}, com sede em {site.address.locality} — {site.address.region}, Brasil.
+            Contato: <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.
+          </p>
+
+          <h2>Quais dados coletamos</h2>
+          <p>
+            Coletamos apenas o que você digita no formulário de orçamento: nome,
+            e-mail, telefone/WhatsApp (opcional), tipo de cliente e as informações
+            do evento — datas, cidade, local, formato da sala, duração, número de
+            ouvintes, pares de idiomas e observações.
+          </p>
+          <p>
+            Não usamos cookies de rastreamento, não há pixel de rede social e a
+            análise de acesso, quando ativada, é feita por ferramenta sem cookies
+            e sem identificação individual. Por isso este site não exibe banner de
+            consentimento de cookies.
+          </p>
+
+          <h2>Para que usamos</h2>
+          <p>
+            Exclusivamente para responder ao seu pedido de orçamento e para a
+            comunicação decorrente dele. A base legal é o seu consentimento,
+            manifestado ao marcar a caixa no formulário, e a execução de
+            procedimentos preliminares a um contrato.
+          </p>
+          <p>Não vendemos, alugamos nem compartilhamos seus dados com terceiros para fins de marketing.</p>
+
+          <h2>Por quanto tempo guardamos</h2>
+          <p>
+            Os dados do formulário chegam a nós por e-mail e não ficam
+            armazenados em banco de dados deste site. Mantemos a mensagem pelo
+            tempo necessário ao atendimento e, havendo contratação, pelo prazo
+            legal aplicável a documentos fiscais e contratuais. Não havendo
+            contratação, a mensagem é descartada em até 24 meses.
+          </p>
+
+          <h2>Confidencialidade do conteúdo dos eventos</h2>
+          <p>
+            O conteúdo interpretado é sigiloso. Seguimos o código de ética da APIC
+            e, quando aplicável, acordos de confidencialidade específicos. Nomes de
+            clientes e imagens só aparecem neste site com autorização registrada;
+            na ausência dela, publicamos apenas setor, cidade e ano.
+          </p>
+
+          <h2>Seus direitos</h2>
+          <p>
+            Você pode solicitar confirmação de tratamento, acesso, correção,
+            anonimização, portabilidade ou eliminação dos seus dados, além de
+            revogar o consentimento a qualquer momento. Basta escrever para
+            {' '}<a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.
+            Respondemos em até 15 dias.
+          </p>
+        </>
+      ) : (
+        <>
+          <h2>Who the controller is</h2>
+          <p>
+            The controller of personal data processed through this site is
+            <strong> {site.legal.razaoSocial}</strong>, registered under CNPJ
+            {' '}{site.legal.cnpj}, based in {site.address.locality} — {site.address.region}, Brazil.
+            Contact: <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.
+          </p>
+
+          <h2>What we collect</h2>
+          <p>
+            Only what you type into the quote form: name, email, phone/WhatsApp
+            (optional), client type, and the event details — dates, city, venue,
+            room format, duration, number of listeners, language pairs and notes.
+          </p>
+          <p>
+            We use no tracking cookies and no social media pixels, and analytics,
+            where enabled, is cookieless and does not identify individuals. That
+            is why this site shows no cookie consent banner.
+          </p>
+
+          <h2>What we use it for</h2>
+          <p>
+            Solely to answer your quote request and to carry on the resulting
+            conversation. The legal basis is your consent, given by ticking the
+            box on the form, together with the pre-contractual steps that follow.
+          </p>
+          <p>We do not sell, rent or share your data with third parties for marketing.</p>
+
+          <h2>How long we keep it</h2>
+          <p>
+            Form submissions reach us by email and are not stored in any database
+            on this site. We keep the message for as long as the enquiry requires
+            and, if you go on to book, for the statutory period applying to tax
+            and contractual records. If no booking follows, the message is
+            discarded within 24 months.
+          </p>
+
+          <h2>Confidentiality of event content</h2>
+          <p>
+            Interpreted content is confidential. We follow APIC's code of ethics
+            and, where applicable, specific non-disclosure agreements. Client
+            names and images appear on this site only with recorded permission;
+            without it we publish sector, city and year only.
+          </p>
+
+          <h2>Your rights</h2>
+          <p>
+            You may request confirmation of processing, access, correction,
+            anonymisation, portability or deletion of your data, and you may
+            withdraw consent at any time. Write to
+            {' '}<a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.
+            We respond within 15 days.
+          </p>
+        </>
+      )}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .prose { margin-block-start: var(--space-l); }
+  .prose h2 { font-size: var(--step-2); margin-block: var(--space-l) var(--space-s); }
+  .prose p + p { margin-block-start: var(--space-s); }
+</style>

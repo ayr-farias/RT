@@ -1,0 +1,29 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+
+interface Props { items: CollectionEntry<'faq'>[]; }
+const { items } = Astro.props;
+
+const sorted = [...items].sort((a, b) => a.data.order - b.data.order);
+const rendered = await Promise.all(
+  sorted.map(async (entry) => ({ entry, Content: (await render(entry)).Content })),
+);
+---
+{/* The explainer FAQ is not a sequence, so no 01 / 02 / 03 markers (§11). */}
+<div class="faq">
+  {rendered.map(({ entry, Content }) => (
+    <section class="item">
+      <h2 id={entry.id.split('/').pop()}>{entry.data.question}</h2>
+      <div class="answer measure"><Content /></div>
+    </section>
+  ))}
+</div>
+
+<style>
+  .faq { display: grid; gap: var(--space-l); }
+  .item h2 { font-size: var(--step-2); margin-block-end: var(--space-s); }
+  .answer :global(p + p) { margin-block-start: var(--space-s); }
+  .answer :global(ul) { margin-block-start: var(--space-s); padding-inline-start: 1.2rem; }
+  .answer :global(li + li) { margin-block-start: 0.3rem; }
+  .answer :global(strong) { font-weight: 600; }
+</style>

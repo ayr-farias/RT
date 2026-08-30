@@ -1,0 +1,73 @@
+---
+import type { Lang } from '@/data/site';
+import { t } from '@/i18n/utils';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props { lang: Lang; events: CollectionEntry<'events'>[]; }
+const { lang, events } = Astro.props;
+const s = t(lang);
+
+const sorted = [...events].sort((a, b) => b.data.year - a.data.year);
+
+/**
+ * The render-side half of the confidentiality gate. The schema guarantees a
+ * photo cannot exist without consent; this guarantees a client name cannot
+ * render without `clientPublic`. An uncleared entry still carries weight as
+ * sector + city (§5).
+ */
+function heading(e: CollectionEntry<'events'>): string {
+  const { client, clientPublic, sector, city, state, year } = e.data;
+  const place = `${city}, ${state}`;
+  return client && clientPublic
+    ? `${client} — ${place}, ${year}`
+    : `${sector}, ${place}, ${year}`;
+}
+---
+{sorted.length === 0 ? (
+  <p class="secondary">{s.events.empty}</p>
+) : (
+  <ul class="grid">
+    {sorted.map((e) => (
+      <li class="event">
+        {e.data.photo && e.data.photoConsent && (
+          <img src={e.data.photo} alt="" width="640" height="420" loading="lazy" decoding="async" />
+        )}
+        <p class="format">{s.events.formats[e.data.format]}</p>
+        <h3>{heading(e)}</h3>
+        <p class="meta secondary">
+          {!(e.data.client && e.data.clientPublic) && (
+            <span class="conf">{s.events.confidential}</span>
+          )}
+          {e.data.listeners && <span>{s.events.listeners(e.data.listeners)}</span>}
+        </p>
+      </li>
+    ))}
+  </ul>
+)}
+
+<style>
+  .grid {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    gap: var(--space-l) var(--space-m);
+  }
+  .event { display: grid; gap: 0.4rem; align-content: start; }
+  .event img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 640 / 420;
+    object-fit: cover;
+    margin-block-end: 0.4rem;
+  }
+  .format {
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--channel-on-light);
+  }
+  h3 { font-size: var(--step-1); }
+  .meta { font-size: var(--step--1); display: flex; flex-wrap: wrap; gap: 0.4rem var(--space-s); }
+  .conf { font-style: italic; }
+</style>

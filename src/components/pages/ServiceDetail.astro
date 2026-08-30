@@ -1,0 +1,128 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import type { Lang } from '@/data/site';
+import { whatsappLink } from '@/data/site';
+import { path } from '@/i18n/routes';
+import { t, pairLabels } from '@/i18n/utils';
+import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import Schema from '@/components/Schema.astro';
+
+interface Props { lang: Lang; entry: CollectionEntry<'services'>; }
+const { lang, entry } = Astro.props;
+const s = t(lang);
+const { Content } = await render(entry);
+const d = entry.data;
+const routeKey = d.key as 'portable' | 'remote' | 'consecutive' | 'conferences';
+---
+<Base
+  lang={lang}
+  routeKey={routeKey}
+  title={d.seo.title}
+  description={d.seo.description}
+>
+  <Schema
+    slot="head"
+    lang={lang}
+    routeKey={routeKey}
+    breadcrumbs={[
+      { name: s.common.home, key: 'home' },
+      { name: s.services.title, key: 'services' },
+    ]}
+  />
+
+  <div class="shell section">
+    <Breadcrumbs
+      lang={lang}
+      trail={[{ name: s.common.home, key: 'home' }, { name: s.services.title, key: 'services' }]}
+      current={d.title}
+    />
+
+    <header class="head">
+      <p class="tier" data-in-house={String(d.inHouse)}>
+        {d.inHouse ? s.services.inHouse : s.services.partnered}
+      </p>
+      <h1>{d.title}</h1>
+      <p class="lede measure">{d.summary}</p>
+
+      <dl class="facts">
+        {d.maxListeners && (
+          <div>
+            <dt>{lang === 'pt' ? 'Capacidade' : 'Capacity'}</dt>
+            <dd>{s.services.upTo(d.maxListeners)}</dd>
+          </div>
+        )}
+        <div>
+          <dt>{s.services.pairsLabel}</dt>
+          <dd>{d.pairs.map((p) => pairLabels[lang][p] ?? p).join(' · ')}</dd>
+        </div>
+        {d.platforms && d.platforms.length > 0 && (
+          <div>
+            <dt>{s.services.platformsLabel}</dt>
+            <dd>{d.platforms.join(' · ')}</dd>
+          </div>
+        )}
+      </dl>
+    </header>
+
+    <div class="prose measure"><Content /></div>
+
+    <aside class="cta">
+      <p>{lang === 'pt'
+        ? 'Se o seu formato se parece com isto, o orçamento sai rápido.'
+        : 'If your format looks like this, a quote comes back quickly.'}</p>
+      <p class="btns">
+        <a class="btn btn--primary" href={path('quote', lang)}>{s.nav.quote}</a>
+        <a class="btn btn--secondary" href={whatsappLink(lang)} rel="noopener">
+          {s.home.heroCtaWhats}
+        </a>
+      </p>
+    </aside>
+  </div>
+</Base>
+
+<style>
+  .head { margin-block: var(--space-l) var(--space-xl); }
+  .tier {
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--mute-on-light);
+    border-inline-start: 3px solid var(--channel);
+    padding-inline-start: 0.6rem;
+    margin-block-end: var(--space-m);
+  }
+  .tier[data-in-house='false'] { border-inline-start-color: var(--mute); }
+  .lede { font-size: var(--step-1); margin-block-start: var(--space-m); }
+  .facts {
+    margin-block-start: var(--space-l);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m) var(--space-l);
+    font-size: var(--step--1);
+    border-block-start: 1px solid var(--hairline);
+    padding-block-start: var(--space-m);
+  }
+  .facts > div { display: grid; gap: 0.15rem; }
+  dt { font-family: var(--font-display); font-weight: 600; color: var(--mute-on-light); }
+  dd { margin: 0; }
+
+  .prose :global(h2) {
+    font-size: var(--step-2);
+    margin-block: var(--space-l) var(--space-m);
+  }
+  .prose :global(p + p),
+  .prose :global(ul),
+  .prose :global(ol) { margin-block-start: var(--space-s); }
+  .prose :global(ul), .prose :global(ol) { padding-inline-start: 1.2rem; }
+  .prose :global(li + li) { margin-block-start: 0.35rem; }
+  .prose :global(strong) { font-weight: 600; }
+  .prose :global(em) { font-style: italic; }
+
+  .cta {
+    margin-block-start: var(--space-xl);
+    border-block-start: 3px solid var(--channel);
+    padding-block-start: var(--space-m);
+  }
+  .btns { display: flex; flex-wrap: wrap; gap: var(--space-s); margin-block-start: var(--space-m); }
+</style>

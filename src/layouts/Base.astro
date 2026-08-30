@@ -1,0 +1,70 @@
+---
+import '@/styles/global.css';
+import { site, type Lang } from '@/data/site';
+import { routes, type RouteKey } from '@/i18n/routes';
+import { t, htmlLang } from '@/i18n/utils';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+
+interface Props {
+  lang: Lang;
+  routeKey: RouteKey;
+  title: string;
+  description: string;
+  /** Set on the one page that owns the LCP image, to preload it. */
+  preloadImage?: string;
+  class?: string;
+}
+
+const { lang, routeKey, title, description, preloadImage, class: klass } = Astro.props;
+const s = t(lang);
+
+const canonical = new URL(routes[routeKey][lang], site.origin).href;
+const ptHref = new URL(routes[routeKey].pt, site.origin).href;
+const enHref = new URL(routes[routeKey].en, site.origin).href;
+---
+
+<!doctype html>
+<html lang={htmlLang[lang]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    {/* x-default points at Portuguese: it carries the local SEO weight (§7). */}
+    <link rel="alternate" hreflang="pt-BR" href={ptHref} />
+    <link rel="alternate" hreflang="en" href={enHref} />
+    <link rel="alternate" hreflang="x-default" href={ptHref} />
+
+    {/* Preload the display face only (§12). */}
+    <link
+      rel="preload"
+      href="/fonts/archivo-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    {preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={lang === 'pt' ? 'pt_BR' : 'en_US'} />
+    <meta property="og:site_name" content={site.brand} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <slot name="head" />
+  </head>
+
+  <body>
+    <a class="skip" href="#main">{s.nav.skipToContent}</a>
+    <Nav lang={lang} routeKey={routeKey} />
+    <main id="main" class={klass}>
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>

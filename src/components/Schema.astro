@@ -1,6 +1,6 @@
 ---
 import { site, type Lang } from '@/data/site';
-import { routes, type RouteKey } from '@/i18n/routes';
+import { path, type RouteKey } from '@/i18n/routes';
 import { interpreters } from '@/data/interpreters';
 
 interface FaqItem { question: string; answer: string; }
@@ -16,8 +16,9 @@ interface Props {
 }
 const { lang, routeKey, faq, breadcrumbs } = Astro.props;
 
-const url = (k: RouteKey) => new URL(routes[k][lang], site.origin).href;
-const orgId = `${site.origin}/#organization`;
+const origin = Astro.site ?? new URL(site.origin);
+const url = (k: RouteKey) => new URL(path(k, lang), origin).href;
+const orgId = `${new URL(import.meta.env.BASE_URL, origin).href.replace(/\/$/, '')}/#organization`;
 
 const address = {
   '@type': 'PostalAddress',
@@ -30,7 +31,7 @@ const address = {
 
 const people = interpreters.map((p) => ({
   '@type': 'Person',
-  '@id': `${site.origin}/#${p.id}`,
+  '@id': `${orgId.replace('#organization', '')}#${p.id}`,
   name: p.name,
   jobTitle: lang === 'pt' ? 'Intérprete de conferência' : 'Conference interpreter',
   knowsLanguage: p.knowsLanguage,
@@ -50,7 +51,7 @@ const organization = {
   name: site.brand,
   legalName: site.legal.razaoSocial,
   taxID: site.legal.cnpj,
-  url: site.origin,
+  url: new URL(import.meta.env.BASE_URL, origin).href,
   telephone: `+${site.contact.whatsappE164}`,
   email: site.contact.email,
   address,

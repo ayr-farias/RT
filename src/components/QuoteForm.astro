@@ -1,12 +1,17 @@
 ---
 import type { Lang } from '@/data/site';
-import { path } from '@/i18n/routes';
+import { path, asset } from '@/i18n/routes';
 import { t } from '@/i18n/utils';
 
 interface Props { lang: Lang; }
 const { lang } = Astro.props;
 const s = t(lang);
 const f = s.quote.fields;
+
+// GitHub Pages is static-only and cannot run functions/api/quote.ts, so the
+// demo build says so plainly rather than letting a submit fail into the error
+// state and read as a bug.
+const isDemo = import.meta.env.PUBLIC_DEMO === 'true';
 
 // Handed to the island as one attribute so the client script ships no strings.
 const messages = JSON.stringify({
@@ -21,12 +26,15 @@ const messages = JSON.stringify({
 <form
   class="quote"
   method="POST"
-  action="/api/quote"
+  action={asset("api/quote")}
   data-quote-form
   data-messages={messages}
   novalidate
 >
   <input type="hidden" name="lang" value={lang} />
+  {isDemo && (
+    <p class="demo-notice" role="note">{s.quote.demoNotice}</p>
+  )}
   {/* Spam trap 1: honeypot. Real people never fill this. */}
   <div class="hp" aria-hidden="true">
     <label>
@@ -148,7 +156,9 @@ const messages = JSON.stringify({
   </fieldset>
 
   <p class="actions">
-    <button class="btn btn--primary" type="submit" data-submit>{f.submit}</button>
+    <button class="btn btn--primary" type="submit" data-submit disabled={isDemo}>
+      {f.submit}
+    </button>
   </p>
 
   <p class="form-error" role="alert" hidden data-error></p>
@@ -209,6 +219,13 @@ const messages = JSON.stringify({
   .choice input { margin: 0; flex: none; translate: 0 0.15em; }
   .consent .choice { align-items: flex-start; }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .demo-notice {
+    border-inline-start: 3px solid var(--channel);
+    background: color-mix(in srgb, var(--channel) 10%, transparent);
+    padding: var(--space-m);
+    font-size: var(--step--1);
+  }
+  button[disabled] { opacity: 0.55; cursor: not-allowed; }
   .actions { margin: 0; }
   [aria-invalid='true'] { border-color: #A3301B; border-width: 2px; }
   .field-error { color: #A3301B; font-size: var(--step--1); font-family: var(--font-display); }

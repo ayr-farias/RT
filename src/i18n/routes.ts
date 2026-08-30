@@ -29,14 +29,32 @@ export type RouteKey = keyof typeof routes;
 export const serviceKeys = ['portable', 'remote', 'consecutive', 'conferences'] as const;
 export type ServiceKey = (typeof serviceKeys)[number];
 
+/**
+ * Every route in this table is root-absolute. When the site is served from a
+ * subpath — the GitHub Pages demo lives at /RT/ — Astro sets BASE_URL and each
+ * link has to be rewritten, or the whole site 404s. Both accessors below go
+ * through `withBase`, so nothing needs to know about the base except this file.
+ */
+function withBase(p: string): string {
+  const base = import.meta.env.BASE_URL || '/';
+  if (base === '/') return p;
+  const trimmed = base.endsWith('/') ? base.slice(0, -1) : base;
+  return p === '/' ? `${trimmed}/` : `${trimmed}${p}`;
+}
+
 export function path(key: RouteKey, lang: Lang): string {
-  return routes[key][lang];
+  return withBase(routes[key][lang]);
+}
+
+/** Base-aware URL for a file in public/, e.g. asset('fonts/x.woff2'). */
+export function asset(relative: string): string {
+  return withBase(`/${relative.replace(/^\//, '')}`);
 }
 
 /** The opposite locale's URL for the same page. Never the homepage. */
 export function alternate(key: RouteKey, current: Lang): { lang: Lang; href: string } {
   const other: Lang = current === 'pt' ? 'en' : 'pt';
-  return { lang: other, href: routes[key][other] };
+  return { lang: other, href: withBase(routes[key][other]) };
 }
 
 /** Primary nav, in order. Service children hang off `services`. */

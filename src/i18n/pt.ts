@@ -147,6 +147,8 @@ export const pt = {
       required: 'obrigatório',
       optional: 'opcional',
     },
+    demoNotice:
+      'Esta é uma demonstração. O formulário valida os campos, mas não envia — o envio depende de um endpoint que só existe no site publicado. Para falar com a gente agora, use o WhatsApp.',
     success: {
       title: 'Pedido recebido',
       body: `Respondemos em até ${site.contact.responseTimeHours} horas em dias úteis, com um número ou com as duas ou três perguntas que ainda faltarem. Se a data for urgente, chame no WhatsApp que é mais rápido.`,

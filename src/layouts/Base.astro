@@ -1,7 +1,7 @@
 ---
 import '@/styles/global.css';
 import { site, type Lang } from '@/data/site';
-import { routes, type RouteKey } from '@/i18n/routes';
+import { path, asset, type RouteKey } from '@/i18n/routes';
 import { t, htmlLang } from '@/i18n/utils';
 import Nav from '@/components/Nav.astro';
 import Footer from '@/components/Footer.astro';
@@ -19,9 +19,12 @@ interface Props {
 const { lang, routeKey, title, description, preloadImage, class: klass } = Astro.props;
 const s = t(lang);
 
-const canonical = new URL(routes[routeKey][lang], site.origin).href;
-const ptHref = new URL(routes[routeKey].pt, site.origin).href;
-const enHref = new URL(routes[routeKey].en, site.origin).href;
+// Astro.site reflects the build target (production origin, or the demo host),
+// and path() carries any base path, so these stay correct for both deploys.
+const origin = Astro.site ?? new URL(site.origin);
+const canonical = new URL(path(routeKey, lang), origin).href;
+const ptHref = new URL(path(routeKey, 'pt'), origin).href;
+const enHref = new URL(path(routeKey, 'en'), origin).href;
 ---
 
 <!doctype html>
@@ -41,7 +44,7 @@ const enHref = new URL(routes[routeKey].en, site.origin).href;
     {/* Preload the display face only (§12). */}
     <link
       rel="preload"
-      href="/fonts/archivo-latin.woff2"
+      href={asset("fonts/archivo-latin.woff2")}
       as="font"
       type="font/woff2"
       crossorigin

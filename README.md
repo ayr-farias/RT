@@ -60,10 +60,16 @@ To add real media:
 - **Longer reel** — `<VideoFacade>` is built and unused; nothing loads from
   YouTube until the click.
 
-## Deploy — Cloudflare Pages
+## Deploy
 
-Build command `npm run build`, output directory `dist`. `functions/api/quote.ts`
-is picked up automatically as a Pages Function at `/api/quote`.
+Two targets, one codebase. `site` and `base` are build-time environment
+variables, so neither build needs a code change.
+
+### Production — Cloudflare Pages (recifetranslators.com.br)
+
+Build command `npm run build`, output directory `dist`, no env overrides.
+`functions/api/quote.ts` is picked up automatically as a Pages Function at
+`/api/quote`.
 
 Set these in Pages → Settings → Environment variables (see `.env.example`):
 `RESEND_API_KEY`, `QUOTE_TO`, `QUOTE_FROM`.
@@ -71,6 +77,30 @@ Set these in Pages → Settings → Environment variables (see `.env.example`):
 The form posts JSON when JS is available and falls back to a native POST that
 returns a real HTML confirmation page when it is not. Spam handling is a
 honeypot plus a submission-time trap — no CAPTCHA on a lead form.
+
+### Demonstration — GitHub Pages (ayr-farias.github.io/RT)
+
+`.github/workflows/deploy-pages.yml` builds and deploys on every push to
+`main`. **One manual step:** in the repo, Settings → Pages → Build and
+deployment → Source → **GitHub Actions**. Without it the workflow runs but
+nothing publishes.
+
+The workflow sets three variables:
+
+| variable | value | effect |
+|---|---|---|
+| `PUBLIC_SITE_URL` | `https://ayr-farias.github.io` | canonicals and JSON-LD |
+| `PUBLIC_BASE_PATH` | `/RT` | every link, asset and font URL |
+| `PUBLIC_DEMO` | `true` | the quote form says it does not send |
+
+GitHub Pages is static-only and cannot run the Pages Function, so on the demo
+the quote form validates but does not submit, and says so. WhatsApp and email
+still work. Everything else — both locales, the language switcher, the consent
+gates, the FAQ schema — behaves exactly as in production.
+
+Links are root-absolute in `src/i18n/routes.ts` and pass through `withBase()`,
+so the base path is handled in one place. If you add a hardcoded `/...` href or
+asset reference elsewhere, it will 404 on the demo; use `path()` or `asset()`.
 
 ## Deviations from the brief
 

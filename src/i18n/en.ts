@@ -147,6 +147,8 @@ export const en = {
       required: 'required',
       optional: 'optional',
     },
+    demoNotice:
+      'This is a demonstration. The form validates its fields but does not send — submitting depends on an endpoint that only exists on the published site. To reach us now, use WhatsApp.',
     success: {
       title: 'Request received',
       body: `We reply within ${site.contact.responseTimeHours} hours on business days, with a number or with the two or three questions still missing. If the date is urgent, WhatsApp is faster.`,

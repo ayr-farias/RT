@@ -3,8 +3,23 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { site } from './src/data/site.ts';
 
+/**
+ * Two deploy targets from one codebase:
+ *
+ *   Production — Cloudflare Pages at recifetranslators.com.br, served at the
+ *   root. Defaults below; /api/quote runs as a Pages Function.
+ *
+ *   Demonstration — GitHub Pages at ayr-farias.github.io/RT, served under a
+ *   subpath. The workflow sets PUBLIC_SITE_URL and PUBLIC_BASE_PATH, and
+ *   PUBLIC_DEMO so the quote form states plainly that it does not send
+ *   (GitHub Pages is static-only and cannot run the Function).
+ */
+const siteUrl = process.env.PUBLIC_SITE_URL ?? site.origin;
+const basePath = process.env.PUBLIC_BASE_PATH || undefined;
+
 export default defineConfig({
-  site: site.origin,
+  site: siteUrl,
+  base: basePath,
   output: 'static',
   trailingSlash: 'ignore',
 

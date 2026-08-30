@@ -7,5 +7,5 @@ year: 2024
 format: remote
 pair: en-pt
 listeners: 9
-interpreters: [ayrton]
+interpreters: [gustavo]
 ---

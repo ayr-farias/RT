@@ -39,8 +39,8 @@ export const en = {
 
     pair: {
       title: 'A fixed working pair, not two freelancers assembled per job',
-      body: 'Ayrton and Lorena work together. You are not testing the pairing on the day of the event, and an agency does not have to spend effort matching interpreters who have never heard each other work. The handover is already solved.',
-      alt: 'Ayrton and Lorena, interpreters at Recife Translators',
+      body: 'Gustavo and Lorena work together. You are not testing the pairing on the day of the event, and an agency does not have to spend effort matching interpreters who have never heard each other work. The handover is already solved.',
+      alt: 'Gustavo and Lorena, interpreters at Recife Translators',
     },
 
     owned: {

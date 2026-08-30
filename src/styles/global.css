@@ -1,35 +1,34 @@
 @import './fonts.css';
 
 /* ─────────────────────────────────────────────────────────────
-   Tokens. The blues are taken from the existing recifetranslators.com.br:
-     #345895  the site's dominant indigo
-     #282C33  its dark slate panels — reused here as body ink
-     #ABB2BF  its muted blue-grey — the basis for the mute tones
+   Tokens. The blue family comes from the existing
+   recifetranslators.com.br (#345895 indigo, #282C33 slate panels,
+   #ABB2BF blue-grey), taken a shade darker for more weight behind
+   the gold. The accent is the brief's gold — brass signage against
+   navy, rather than the live site's magenta.
 
-   The accent is not the live site's magenta; it is an aqua drawn from the
-   same blue family, so it reads as a live-channel signal without leaving the
-   palette. It carries the role the gold had in the original design direction.
-
-   WCAG AA (§12) is enforced per background, because #345895 is a mid-tone and
-   a single accent value cannot clear 4.5:1 on both the page and the indigo:
-     --channel        full strength — fills, rules, large text only
-     --channel-on-dark   small text on indigo grounds   4.52
-     --channel-on-light  small text on the page         4.54
-     --mute-on-light     secondary text on the page     4.51
-     --mute-on-dark      secondary text on indigo       4.50
+   WCAG AA (§12) is enforced per background, because gold on indigo
+   reaches only 3.20 (large-text) and no single accent value clears
+   4.5:1 on both the page and the indigo:
+     --channel           full strength — fills, rules, large text only
+     --channel-on-dark   small text on indigo   4.55
+     --channel-on-light  small text on page     4.54
+     --mute-on-dark      secondary on indigo    4.52
+     --mute-on-light     secondary on page      4.51
+   Verified against the rendered DOM across all 24 pages.
    ───────────────────────────────────────────────────────────── */
 :root {
-  --brand:      #345895;  /* primary indigo, section grounds */
-  --brand-deep: #213860;  /* footer, hero overlay */
+  --brand:      #284576;  /* primary indigo, section grounds */
+  --brand-deep: #1C3358;  /* footer, hero overlay */
   --page:       #F1F3F7;  /* cool near-white, reading surface */
   --ink:        #282C33;  /* body text */
-  --channel:    #2BB8C4;  /* the live-channel signal: fills, rules, active states */
+  --channel:    #C68A12;  /* the live-channel signal: fills, rules, active states */
   --mute:       #8894A8;  /* hairlines, decorative blue-grey */
 
-  --channel-on-dark:  #93DBE1;
-  --channel-on-light: #1C7A83;
+  --channel-on-dark:  #D8AD54;
+  --channel-on-light: #94660D;
   --mute-on-light:    #657082;
-  --mute-on-dark:     #C9CFD8;
+  --mute-on-dark:     #ABB3C1;
 
   --hairline: color-mix(in srgb, var(--mute) 45%, transparent);
 

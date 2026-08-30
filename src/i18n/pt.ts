@@ -40,8 +40,8 @@ export const pt = {
 
     pair: {
       title: 'Uma dupla fixa, não dois freelancers montados por evento',
-      body: 'Ayrton e Lorena trabalham juntos. Vocês não precisam testar a compatibilidade da dupla no dia do evento, e a agência não precisa gastar esforço combinando intérpretes que nunca se ouviram. O revezamento já está resolvido.',
-      alt: 'Ayrton e Lorena, intérpretes da Recife Translators',
+      body: 'Gustavo e Lorena trabalham juntos. Vocês não precisam testar a compatibilidade da dupla no dia do evento, e a agência não precisa gastar esforço combinando intérpretes que nunca se ouviram. O revezamento já está resolvido.',
+      alt: 'Gustavo e Lorena, intérpretes da Recife Translators',
     },
 
     owned: {

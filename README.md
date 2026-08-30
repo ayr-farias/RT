@@ -55,7 +55,7 @@ To add real media:
 
 - **Hero video** — pass `video={{ mp4, webm, poster }}` to `<Hero>` in
   `src/components/pages/Home.astro`. ≤6s, silent, ≤2.5 MB total, poster set.
-- **Portraits** — `/media/ayrton.jpg`, `/media/lorena.jpg` (paths already in
+- **Portraits** — `/media/gustavo.jpg`, `/media/lorena.jpg` (paths already in
   `src/data/interpreters.ts`); swap the `.placeholder` divs for `<Image>`.
 - **Longer reel** — `<VideoFacade>` is built and unused; nothing loads from
   YouTube until the click.
@@ -79,20 +79,19 @@ honeypot plus a submission-time trap — no CAPTCHA on a lead form.
   `/en/servicos/…`) which landed in the sitemap carrying hreflang alternates —
   duplicate English URLs competing with the real ones. Re-enable only if a
   locale goes partial again.
-- **Palette taken from the live site, not from §11.** The brief specifies a
-  viridian-and-gold palette; the existing recifetranslators.com.br is indigo, so
-  the tokens are built from its actual colours — `#345895` (its dominant
-  indigo), `#282C33` (its slate panels, reused as body ink) and its blue-grey
-  muted tones. The accent is **not** the live site's magenta `#C778DD`: it is an
-  aqua `#2BB8C4` drawn from the same blue family, filling the role gold had in
-  the brief.
+- **Palette: the live site's blues, the brief's gold.** The blue family is taken
+  from the existing recifetranslators.com.br — `#345895` (its dominant indigo),
+  `#282C33` (its slate panels, reused as body ink) and `#ABB2BF` (its blue-grey)
+  — then darkened a shade to `#284576` to put more weight behind the accent. The
+  accent is the brief's gold `#C68A12`, not the live site's magenta `#C778DD`.
 
-  `#345895` is a mid-tone, so no single accent value clears 4.5:1 on both the
-  page and the indigo. AA (§12) is therefore enforced per background:
-  `--channel` at full strength is for fills, rules and large text, while
-  `--channel-on-dark`, `--channel-on-light`, `--mute-on-dark` and
-  `--mute-on-light` carry small text. All 24 pages were audited against the
-  rendered DOM: zero contrast failures.
+  Gold on indigo reaches only 3.20, which is large-text AA but not small-text,
+  and no single accent value clears 4.5:1 on both the page and the indigo. AA
+  (§12) is therefore enforced per background: `--channel` at full strength is
+  for fills, rules and large text, while `--channel-on-dark`,
+  `--channel-on-light`, `--mute-on-dark` and `--mute-on-light` carry small text.
+  All 24 pages audited against the rendered DOM: zero contrast failures.
+
 - **Astro 7, not 5.** `src/content.config.ts` is unchanged in shape, but Zod is
   v4 — `z` is imported from `zod` directly rather than from `astro:content`,
   whose re-export is deprecated.

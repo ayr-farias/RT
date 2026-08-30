@@ -154,8 +154,9 @@ const seo = lang === 'pt'
     font-stretch: 118%;
     font-weight: 700;
     line-height: 0.85;
-    /* --channel at full strength is 2.94 on --brand, just under the 3.0
-       large-text threshold. The on-dark variant is the readable one. */
+    /* --channel at full strength clears large-text AA on --brand only just
+       (3.20 vs 3.0). The on-dark variant sits at 4.55 and is the readable one
+       for a figure this load-bearing. */
     color: var(--channel-on-dark);
   }
   .counter .l {

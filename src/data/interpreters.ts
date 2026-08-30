@@ -7,7 +7,7 @@ import type { Lang } from './site';
  * (§3). Saying so here prevents inquiries that have to be walked back.
  */
 export interface Interpreter {
-  id: 'ayrton' | 'lorena';
+  id: 'gustavo' | 'lorena';
   name: string;
   /** BCP-47 tags, used directly in JSON-LD `knowsLanguage`. */
   knowsLanguage: string[];
@@ -21,8 +21,8 @@ export interface Interpreter {
 
 export const interpreters: Interpreter[] = [
   {
-    id: 'ayrton',
-    name: 'Ayrton',
+    id: 'gustavo',
+    name: 'Gustavo',
     knowsLanguage: ['pt-BR', 'en'],
     association: {
       name: 'APIC',
@@ -33,7 +33,7 @@ export const interpreters: Interpreter[] = [
       url: 'https://www.apic.org.br/',
     },
     since: 2014,
-    photo: '/media/ayrton.jpg',
+    photo: '/media/gustavo.jpg',
     pairs: ['en-pt', 'pt-en'],
     bio: {
       pt: 'Intérprete de conferência associado à APIC, com inglês e português como par de trabalho. Atua em auditorias técnicas, visitas de planta, reuniões de conselho e negociações — formatos em que o intérprete precisa acompanhar o grupo pelo espaço, e não ficar preso a uma cabine. Responsável pela operação do equipamento portátil.',

@@ -7,5 +7,5 @@ year: 2024
 format: portable
 pair: en-pt
 listeners: 22
-interpreters: [ayrton, lorena]
+interpreters: [gustavo, lorena]
 ---

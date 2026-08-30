@@ -7,5 +7,5 @@ year: 2023
 format: booth
 pair: en-pt
 listeners: 180
-interpreters: [ayrton, lorena]
+interpreters: [gustavo, lorena]
 ---

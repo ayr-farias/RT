@@ -48,7 +48,7 @@ const events = defineCollection({
       format: z.enum(['portable', 'booth', 'remote', 'consecutive', 'escort']),
       pair: pairs,
       listeners: z.number().optional(),
-      interpreters: z.array(z.enum(['ayrton', 'lorena'])).nonempty(),
+      interpreters: z.array(z.enum(['gustavo', 'lorena'])).nonempty(),
       photo: z.string().optional(),
       /** Gate: the photo renders only if this is true. */
       photoConsent: z.boolean().default(false),

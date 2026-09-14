@@ -8,6 +8,7 @@ import Base from '@/layouts/Base.astro';
 import Hero from '@/components/Hero.astro';
 import TrustStrip from '@/components/TrustStrip.astro';
 import Schema from '@/components/Schema.astro';
+import Hypothesis from '@/components/Hypothesis.astro';
 
 interface Props { lang: Lang; }
 const { lang } = Astro.props;
@@ -122,6 +123,7 @@ const seo = lang === 'pt'
       <p class="area secondary">{formatList(site.areaServed, lang)}.</p>
     </div>
   </section>
+<Hypothesis />
 </Base>
 
 <style>

@@ -68,6 +68,8 @@ const enHref = new URL(path(routeKey, 'en'), origin).href;
     <Nav lang={lang} routeKey={routeKey} />
     <main id="main" class={klass}>
       <slot />
+      
+      <Hypothesis />
     </main>
     <Footer lang={lang} />
   </body>
